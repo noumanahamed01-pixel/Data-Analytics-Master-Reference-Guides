@@ -8,7 +8,7 @@ This repository contains my personal, battle-tested reference guides for modern 
 ## 📊 Interactive Live Guides
 Click the links below to view the live, interactive documentation:
 
-* **[The SQL Fluency Ladder](https://noumanahamed01-pixel.github.io/data-analytics-master-reference-guides/sql_mastery_blueprint.html)**
+* **[The SQL Fluency Ladder](https://noumanahamed01.github.io/data-analytics-master-reference-guides/sql_mastery_blueprint.html)**
   * *Focus:* Cloud warehouse optimization (Snowflake/BigQuery), Window Functions, and CTEs.
 * **[The BI Dashboard Ladder](https://[your-username].github.io/[your-repo-name]/bi_dashboard_ladder.html)**
   * *Focus:* Semantic modeling, DAX/LOD context, Dynamic RLS, and UX data-ink ratios.
