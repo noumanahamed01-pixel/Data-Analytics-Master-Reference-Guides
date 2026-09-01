@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The BI Dashboard Ladder — SkyBridge Airlines</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/dax.min.js"></script>
+<style>
+  :root{
+    --bg:#F5F7F9;
+    --surface:#FFFFFF;
+    --ink:#101825;
+    --ink-soft:#4C5A6B;
+    --line:#E1E6EC;
+    --sky:#0B5FA5;
+    --sky-deep:#084A82;
+    --sky-tint:#E7F0FA;
+    --amber:#B45309;
+    --amber-tint:#FEF3E2;
+    --amber-line:#F0B860;
+    --code-bg:#0B1420;
+    --low:#0E8A45;
+    --low-tint:#E5F5EC;
+    --med:#B4740E;
+    --med-tint:#FBF0DC;
+    --high:#C23B33;
+    --high-tint:#FBE9E7;
+    --violet:#5B3FA0;
+    --violet-tint:#EFEAFB;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Inter',sans-serif; font-size:16px; line-height:1.65;
+  }
+  h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; margin:0; color:var(--ink);}
+  code, pre, .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:var(--sky-deep);}
+
+  .navbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(255,255,255,0.92); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:6px; padding:14px 28px;
+    overflow-x:auto; white-space:nowrap;
+  }
+  .navbar .brand{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px;
+    color:var(--sky-deep); margin-right:18px; letter-spacing:0.2px;
+  }
+  .navbar a{
+    text-decoration:none; color:var(--ink-soft); font-size:13.5px; font-weight:600;
+    padding:7px 12px; border-radius:20px; transition:background .15s, color .15s;
+  }
+  .navbar a:hover{background:var(--sky-tint); color:var(--sky-deep);}
+
+  .hero{max-width:920px; margin:0 auto; padding:64px 28px 40px;}
+  .eyebrow{
+    display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:1.4px;
+    text-transform:uppercase; color:var(--sky-deep); background:var(--sky-tint);
+    padding:6px 12px; border-radius:20px; margin-bottom:18px;
+  }
+  .hero h1{font-size:44px; line-height:1.12; font-weight:700; letter-spacing:-0.5px; max-width:760px;}
+  .hero p.lede{font-size:17.5px; color:var(--ink-soft); max-width:660px; margin-top:18px;}
+
+  .ladder{display:flex; gap:10px; margin-top:36px; max-width:800px; flex-wrap:wrap;}
+  .rung{flex:1; min-width:150px; padding:14px 16px; border-radius:10px; border:1px solid var(--line); background:var(--surface); position:relative; overflow:hidden;}
+  .rung::before{content:''; position:absolute; left:0; top:0; bottom:0; width:4px;}
+  .rung.l1::before{background:#6FA8D6;}
+  .rung.l2::before{background:#3E82C2;}
+  .rung.l3::before{background:#0B5FA5;}
+  .rung.l4::before{background:#5B3FA0;}
+  .rung .num{font-size:11px; font-weight:700; color:var(--ink-soft); letter-spacing:1px;}
+  .rung .lab{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px; margin-top:3px;}
+
+  .schema-wrap{max-width:920px; margin:0 auto; padding:8px 28px 56px;}
+  .schema-card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:28px 30px;}
+  .schema-card h3{font-size:19px; margin-bottom:6px;}
+  .schema-card p{color:var(--ink-soft); font-size:14.5px; margin:6px 0 18px;}
+  .tbl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; margin-bottom:6px;}
+  .tbl-chip{border:1px solid var(--line); border-radius:8px; padding:10px 12px; background:#FBFCFD;}
+  .tbl-chip .tname{font-weight:700; font-size:13.5px; color:var(--sky-deep); font-family:'JetBrains Mono',monospace;}
+  .tbl-chip .tcols{font-size:12px; color:var(--ink-soft); margin-top:4px; line-height:1.5;}
+
+  .level{max-width:920px; margin:0 auto; padding:10px 28px 10px;}
+  .level-head{display:flex; align-items:baseline; gap:16px; margin:56px 0 8px; border-bottom:2px solid var(--ink); padding-bottom:14px;}
+  .level-head .lnum{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; color:var(--sky-deep); letter-spacing:1px;}
+  .level-head h2{font-size:26px;}
+  .level-sub{color:var(--ink-soft); font-size:14.5px; margin:6px 0 30px; max-width:680px;}
+
+  .item{background:var(--surface); border:1px solid var(--line); border-radius:14px; margin-bottom:22px; overflow:hidden;}
+  .item-head{padding:18px 24px 4px;}
+  .item-title{font-size:17px; font-weight:700; font-family:'Space Grotesk',sans-serif;}
+  .item-meta{display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap;}
+  .badge{font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; letter-spacing:.3px; display:inline-flex; align-items:center; gap:5px;}
+  .badge::before{content:''; width:6px; height:6px; border-radius:50%; display:inline-block;}
+  .badge.low{background:var(--low-tint); color:var(--low);} .badge.low::before{background:var(--low);}
+  .badge.med{background:var(--med-tint); color:var(--med);} .badge.med::before{background:var(--med);}
+  .badge.high{background:var(--high-tint); color:var(--high);} .badge.high::before{background:var(--high);}
+  .badge.tag{background:var(--violet-tint); color:var(--violet);} .badge.tag::before{background:var(--violet);}
+  .badge.plat{background:var(--sky-tint); color:var(--sky-deep);} .badge.plat::before{background:var(--sky-deep);}
+
+  .scenario{padding:6px 24px 16px; color:var(--ink-soft); font-size:14.5px;}
+  .scenario b{color:var(--ink); font-weight:600;}
+
+  pre{margin:0; padding:18px 24px; background:var(--code-bg); overflow-x:auto; font-size:13px; line-height:1.6;}
+  pre code.hljs{background:transparent; padding:0;}
+
+  .tip{margin:0; padding:14px 24px; background:var(--amber-tint); border-top:1px solid var(--amber-line); font-size:14px; color:#6B3A08;}
+  .tip .tip-lab{font-weight:700; color:var(--amber); font-size:11.5px; letter-spacing:.6px; text-transform:uppercase; display:block; margin-bottom:5px;}
+
+  .content-body{padding:6px 24px 18px; font-size:14.5px; color:var(--ink);}
+  .content-body ul{margin:6px 0 0; padding-left:20px;}
+  .content-body li{margin-bottom:6px;}
+
+  .compare{width:100%; border-collapse:collapse; font-size:13.5px; margin:14px 0 4px;}
+  .compare th, .compare td{border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top;}
+  .compare th{background:#F1F4F7; font-family:'Space Grotesk',sans-serif; font-size:12.5px;}
+  .compare code{background:#EEF2F5; padding:1px 5px; border-radius:4px; font-size:12px;}
+
+  .swatch-row{display:flex; gap:10px; margin:14px 24px 20px; flex-wrap:wrap;}
+  .swatch{flex:1; min-width:130px; border-radius:10px; padding:14px; color:#fff; font-size:12.5px; font-weight:600;}
+
+  footer{max-width:920px; margin:40px auto 70px; padding:24px 28px; border-top:1px solid var(--line); color:var(--ink-soft); font-size:13px;}
+
+  .calculate-spotlight{
+    margin:0; padding:16px 24px 18px;
+    background:var(--violet-tint);
+    border-top:1px solid #C9C0F0;
+    font-size:14px; color:#2D2060; line-height:1.65;
+  }
+  .calculate-spotlight .calc-label{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:13px; color:var(--violet);
+    margin-bottom:10px; letter-spacing:0.2px;
+  }
+  .calculate-spotlight code{
+    background:rgba(91,63,160,0.12); color:var(--violet);
+    padding:1px 5px; border-radius:4px; font-size:12.5px;
+  }
+  .calculate-spotlight p{margin:0 0 8px;}
+  .calculate-spotlight p:last-child{margin-bottom:0;}
+
+  @media (max-width:640px){
+    .hero h1{font-size:32px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <span class="brand">BI DASHBOARD LADDER</span>
+  <a href="#schema">Schema</a>
+  <a href="#level1">L1 · Beginner</a>
+  <a href="#level2">L2 · Intermediate</a>
+  <a href="#level3">L3 · Senior</a>
+  <a href="#level4">L4 · UX &amp; Design</a>
+  <a href="#rls">RLS</a>
+</nav>
+
+<section class="hero">
+  <span class="eyebrow">Analyst → Principal BI Developer</span>
+  <h1>The BI Dashboard Ladder</h1>
+  <p class="lede">A progressive reference for Power BI and Tableau, built around one running business — <b>SkyBridge Airlines</b>, a mid-size carrier tracking flight delays, booking behavior, and route profitability. Every technique is tied to a real operational question, with a Senior Consultant Tip on the judgment call that separates a dashboard that looks finished from one that survives a board meeting.</p>
+
+  <div class="ladder">
+    <div class="rung l1"><div class="num">LEVEL 01</div><div class="lab">Beginner — Connect &amp; Chart</div></div>
+    <div class="rung l2"><div class="num">LEVEL 02</div><div class="lab">Intermediate — Calc, CALCULATE &amp; LOD</div></div>
+    <div class="rung l3"><div class="num">LEVEL 03</div><div class="lab">Senior — Model, Perf &amp; RLS</div></div>
+    <div class="rung l4"><div class="num">LEVEL 04</div><div class="lab">UX, Design &amp; Tooltips</div></div>
+  </div>
+</section>
+
+<section class="schema-wrap" id="schema">
+  <div class="schema-card">
+    <h3>The Business: SkyBridge Airlines</h3>
+    <p>A mid-size airline tracking on-time performance, customer bookings, and route economics. Every dashboard below pulls from this same data — the tables a BI developer on this team would actually connect to.</p>
+    <div class="tbl-grid">
+      <div class="tbl-chip"><div class="tname">Flights</div><div class="tcols">flight_id · route_id · aircraft_id · scheduled_departure · actual_departure · delay_minutes · status</div></div>
+      <div class="tbl-chip"><div class="tname">Routes</div><div class="tcols">route_id · origin_airport · destination_airport · distance_km</div></div>
+      <div class="tbl-chip"><div class="tname">Bookings</div><div class="tcols">booking_id · flight_id · customer_id · booking_date · fare_class · ticket_price · channel</div></div>
+      <div class="tbl-chip"><div class="tname">Customers</div><div class="tcols">customer_id · customer_name · loyalty_tier · home_country</div></div>
+      <div class="tbl-chip"><div class="tname">Aircraft</div><div class="tcols">aircraft_id · model · seat_capacity</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LEVEL 1 ============ -->
+<section class="level" id="level1">
+  <div class="level-head">
+    <span class="lnum">LEVEL 01</span>
+    <h2>Beginner — Connecting Data &amp; Foundational Visuals</h2>
+  </div>
+  <p class="level-sub">Before any DAX or LOD expression matters, the fundamentals: getting the right data in, in the right mode, and picking a chart that actually answers the question asked.</p>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">1.1 — Connecting to Data: Import/Extract vs. Live/DirectQuery</div>
+      <div class="item-meta"><span class="badge plat">Power BI + Tableau</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Ops needs the on-time-performance dashboard refreshed nightly from the flight operations database — not a manually exported spreadsheet that goes stale by Tuesday.</div>
+    <div class="content-body">
+      <ul>
+        <li><b>Power BI — Import mode:</b> data is copied into the model, compressed, and cached. Fast, but only as fresh as the last refresh.</li>
+        <li><b>Power BI — DirectQuery:</b> every visual interaction sends a live query to the source. Always current, but only as fast as the source database.</li>
+        <li><b>Tableau — Extract:</b> Tableau's own compressed snapshot of the data, refreshed on a schedule. Analogous to Power BI Import.</li>
+        <li><b>Tableau — Live connection:</b> queries the source directly on every interaction. Analogous to DirectQuery.</li>
+      </ul>
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Default to Import/Extract unless the dashboard genuinely needs to-the-minute data, like a live departure board. Live/DirectQuery re-runs a query against the source for every click, filter, and hover — a popular dashboard in that mode during peak travel days can meaningfully load the operational database it's reporting on.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">1.2 — Choosing the Right Chart Type</div>
+      <div class="item-meta"><span class="badge plat">Power BI + Tableau</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Leadership wants to see flight volume by route, the on-time percentage trend over the year, and where the route network actually flies.</div>
+    <div class="content-body">
+      <ul>
+        <li><b>Comparing categories</b> (delays by airport) → bar chart</li>
+        <li><b>Trend over time</b> (monthly on-time %) → line chart</li>
+        <li><b>Geographic network</b> (origin–destination pairs) → map / flow map</li>
+        <li><b>Part-to-whole with 2–3 slices</b> (on-time vs. delayed vs. cancelled) → stacked bar or a small donut — never a pie beyond 3–4 categories</li>
+      </ul>
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Resist the reflexive "let's make it a pie chart" request once you're past 3–4 slices. Humans compare bar lengths far more accurately than pie-slice angles — a plain bar chart of delay causes almost always communicates the comparison faster than a colorful wheel.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">1.3 — Filters &amp; Slicers</div>
+      <div class="item-meta"><span class="badge plat">Power BI + Tableau</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Regional hub managers want to self-service filter the same network dashboard down to just their own airport.</div>
+    <div class="content-body">
+      <ul>
+        <li><b>Power BI:</b> visual-level, page-level, and report-level filters, plus interactive slicers on the canvas.</li>
+        <li><b>Tableau:</b> quick filters per worksheet, plus context filters that apply before other calculations run.</li>
+      </ul>
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Scope slicers to only the visuals that should react to them. A KPI card that changes when a user filters an unrelated chart on the same page reads as a bug to a business user, even when it's technically "working as designed" — and it quietly erodes trust in every other number on the dashboard.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">1.4 — KPI Cards &amp; Basic Aggregation</div>
+      <div class="item-meta"><span class="badge plat">Power BI + Tableau</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> The executive summary needs one headline number: this month's on-time performance percentage.</div>
+    <div class="content-body">
+      <ul>
+        <li>A card/KPI visual showing <code class="mono">COUNTROWS(Flights WHERE delay &lt;= 15) / COUNTROWS(Flights)</code>-style aggregation.</li>
+        <li>Both tools support a target/comparison value shown alongside the headline number.</li>
+      </ul>
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Never ship a bare KPI card. "82% on-time" means nothing to a VP without a comparison — last month, the same period last year, or a contractual target. Pair every headline number with a delta or a target line so the viewer doesn't have to ask "is that good?" in the meeting.</div>
+  </div>
+</section>
+
+<!-- ============ LEVEL 2 ============ -->
+<section class="level" id="level2">
+  <div class="level-head">
+    <span class="lnum">LEVEL 02</span>
+    <h2>Intermediate — Calculated Fields, Parameters, DAX &amp; LOD</h2>
+  </div>
+  <p class="level-sub">This is where a dashboard stops being a pass-through of raw columns and starts answering business-specific questions the source system was never built to answer directly.</p>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">2.1 — Calculated Measures: Revenue per Available Seat Kilometer</div>
+      <div class="item-meta"><span class="badge plat">DAX (Power BI)</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Finance wants RASK — Revenue per Available Seat Kilometer — a standard airline profitability metric, on the route-performance dashboard.</div>
+    <pre><code class="language-dax">RASK =
+DIVIDE(
+    SUM ( Bookings[TicketPrice] ),
+    SUMX ( Flights, Flights[Distance_km] * RELATED ( Aircraft[SeatCapacity] ) )
+)</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Wrap every ratio measure in DIVIDE() rather than the raw "/" operator. A route with zero completed flights in a filtered period will otherwise throw a divide-by-zero error that blanks out the entire visual — DIVIDE() lets you return BLANK() or 0 gracefully instead.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">2.2 — LOD Expressions: Customer Lifetime Spend</div>
+      <div class="item-meta"><span class="badge plat">Tableau LOD</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Marketing wants a booking-level table where each row also shows that customer's total lifetime spend, to flag high-value customers whose current booking is unusually small.</div>
+    <pre><code class="language-sql">{ FIXED [Customer ID] : SUM([Ticket Price]) }</code></pre>
+    <div class="content-body">Placed alongside the row-level <code class="mono">[Ticket Price]</code> in the same view, this gives every booking row access to a value computed at the customer grain, not the booking grain.</div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>FIXED expressions compute at the grain you specify regardless of what's on the view — that's the point, but also the trap: FIXED ignores most dashboard filters by default. A "lifetime spend" figure built this way won't shrink when someone filters to last quarter, which is sometimes exactly wrong for the question being asked. Reach for INCLUDE/EXCLUDE, or add the filter to context, when the business actually wants a filtered aggregate.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">2.3 — Parameters: One Dashboard, Swappable Metric</div>
+      <div class="item-meta"><span class="badge plat">Power BI + Tableau</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> The route map should let an analyst toggle between "Revenue," "Passenger Count," and "On-Time %" without maintaining three separate dashboards.</div>
+    <pre><code class="language-sql">-- Tableau: a calculated field driven by a parameter
+CASE [Metric Selector]
+  WHEN 'Revenue'     THEN SUM([Ticket Price])
+  WHEN 'Passengers'  THEN COUNTD([Booking ID])
+  WHEN 'On-Time %'   THEN [On Time Pct]
+END</code></pre>
+    <div class="content-body">Power BI's equivalent is a <b>field parameter</b> — a small table of field references that a slicer swaps between on the same visual.</div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Parameters make one dashboard do the work of three, but they also make a screenshot ambiguous. Always place a visible label showing the current parameter value directly on the dashboard — otherwise a chart forwarded in an email gets misread as showing a metric it isn't.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">2.4 — DAX Time Intelligence: Year-over-Year Delay Trend</div>
+      <div class="item-meta"><span class="badge plat">DAX (Power BI)</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Operations wants year-over-year change in average departure delay, by month, to see if a hub congestion problem is getting worse.</div>
+    <pre><code class="language-dax">Avg Delay PY =
+CALCULATE (
+    AVERAGE ( Flights[DelayMinutes] ),
+    SAMEPERIODLASTYEAR ( 'Date'[Date] )
+)
+
+Delay YoY % = DIVIDE ( [Avg Delay Current] - [Avg Delay PY], [Avg Delay PY] )</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>SAMEPERIODLASTYEAR and every other time-intelligence function require a proper, marked Date table with a contiguous calendar and no missing dates. One gap in the calendar silently breaks the comparison for that period — this is the single most common root cause behind "the YoY numbers look wrong" tickets.</div>
+    <div class="calculate-spotlight">
+      <div class="calc-label">&#x1F4A1; The Magic of <code>CALCULATE</code> — Filter Context</div>
+      <p><code>CALCULATE</code> is the only function in DAX that can <strong>modify filter context</strong>. Every other DAX function evaluates inside the context it is handed — <code>CALCULATE</code> is the one function that can <em>change</em> that context before passing it downstream.</p>
+      <p>In the measure above, <code>CALCULATE( AVERAGE(...), SAMEPERIODLASTYEAR(...) )</code> does not simply filter rows — it <em>replaces</em> the current date filter context with last year's equivalent period, then evaluates the average inside that new context. This is called <strong>context transition</strong>, and it is the mechanism behind every time-intelligence pattern, every "all except this filter" pattern, and most advanced DAX.</p>
+      <p>Understanding this is the lightbulb moment for intermediate Power BI developers. Once you internalize that <code>CALCULATE</code> = "evaluate this expression inside a modified filter context," patterns like <code>REMOVEFILTERS</code>, <code>KEEPFILTERS</code>, and <code>ALL</code> start to make immediate sense instead of feeling like incantations.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LEVEL 3 ============ -->
+<section class="level" id="level3">
+  <div class="level-head">
+    <span class="lnum">LEVEL 03</span>
+    <h2>Senior — Performance, Grain Alignment &amp; Semantic Modeling</h2>
+  </div>
+  <p class="level-sub">The technical skills that don't show up in a single visual, but decide whether the numbers are trustworthy and whether the dashboard survives 200 concurrent users on a Monday morning.</p>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">3.1 — Data Grain Alignment (The Fan-Out Trap)</div>
+      <div class="item-meta"><span class="badge high">Impact: High — wrong numbers, not just slow ones</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> A dashboard combining booking-level ticket sales with flight-level delay events is showing revenue figures that are 2–3x too high.</div>
+    <div class="content-body">
+      A single flight can have multiple bookings (many rows) and, separately, multiple logged delay events (many rows). Joining these two fact tables directly — booking grain to delay-event grain — duplicates each booking row once per delay event on that flight, inflating every downstream SUM.
+      <br><br><b>The fix:</b> aggregate each fact to a shared grain (e.g., one row per flight) before combining them, or connect both fact tables only through a conformed dimension (Flight, Date) in a proper star schema — never join two fact tables directly.
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>This "fan-out" bug is the single most common cause of revenue figures that look implausibly high on a dashboard. Before combining any two tables, ask out loud: "what does one row in each table represent?" If the answer differs, aggregate first or route the relationship through a shared dimension.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">3.2 — Semantic Modeling: One Governed Star Schema</div>
+      <div class="item-meta"><span class="badge high">Impact: High — governance &amp; trust</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> The BI team is asked to support five new dashboards — delays, revenue, loyalty, route network, crew scheduling — without rebuilding data connections and logic five separate times.</div>
+    <div class="content-body">
+      Build conformed fact tables (<code class="mono">FactBookings</code>, <code class="mono">FactFlightOps</code>) around shared dimensions (<code class="mono">DimDate</code>, <code class="mono">DimAirport</code>, <code class="mono">DimAircraft</code>, <code class="mono">DimCustomer</code>) in one governed semantic model — a Power BI dataset or a published Tableau data source — with certified measures that every dashboard author reuses.
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>One governed semantic model with certified measures is what actually prevents the "your revenue number doesn't match my revenue number" argument between departments six months later — not a shared style guide or a naming convention. If every dashboard author writes their own RASK measure independently, they will eventually drift.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">3.3 — Relationship Cardinality &amp; Cross-Filter Direction</div>
+      <div class="item-meta"><span class="badge med">Impact: Medium — silent filter bugs</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> A slicer on Aircraft Model isn't filtering the Bookings table at all, even though the model diagram "looks" fully connected.</div>
+    <div class="content-body">
+      In Power BI, relationships have both a cardinality (one-to-many, many-to-many) and a cross-filter direction (single or bidirectional). A one-to-many relationship set to filter only from the "one" side won't propagate a filter placed on the "many" side back upstream.
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Default to single-direction cross-filtering from dimension tables to fact tables, and reserve bidirectional filtering for genuine edge cases like a many-to-many bridge table. Bidirectional filtering can create ambiguous filter paths across a dense model and carries a measurable, avoidable performance cost.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">3.4 — Measure Optimization with Variables</div>
+      <div class="item-meta"><span class="badge med">Impact: Medium — compounds at scale</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> A route-profitability dashboard used by 200 regional managers takes 15+ seconds to load every morning.</div>
+    <pre><code class="language-dax">Avg Delay Optimized =
+VAR TotalDelay  = SUM ( Flights[DelayMinutes] )
+VAR FlightCount = COUNTROWS ( Flights )
+RETURN
+    DIVIDE ( TotalDelay, FlightCount )</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Use VAR to compute an expression once per measure and reference the result, instead of repeating the same aggregation inline multiple times. Without it, the engine can re-evaluate the same filter context repeatedly inside one measure — a cost that's invisible on a sample dataset but compounds badly across millions of rows and dozens of concurrent viewers.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">3.5 — Incremental Refresh for Large Fact Tables</div>
+      <div class="item-meta"><span class="badge med">Impact: Medium — refresh SLA</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> The Flights fact table holds 10 years of history; a nightly full refresh takes 3 hours and increasingly times out before the morning ops meeting.</div>
+    <div class="content-body">
+      <ul>
+        <li><b>Power BI:</b> define an incremental refresh policy that partitions the table by date range and refreshes only the most recent partition (e.g., last 7 days) nightly, with a full historical rebuild scheduled rarely.</li>
+        <li><b>Tableau:</b> configure an extract with incremental refresh on a date field, so only new/changed rows are appended.</li>
+      </ul>
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Partitioning a large fact table by date and refreshing only the recent partition is usually the single biggest lever for meeting a nightly refresh SLA once history exceeds a year or two — it turns a 3-hour full refresh into a 5-minute incremental one.</div>
+  </div>
+
+  <div class="item" id="rls">
+    <div class="item-head">
+      <div class="item-title">3.6 — Row-Level Security (RLS): One Dashboard for Every Regional Manager</div>
+      <div class="item-meta"><span class="badge high">Impact: High — governance &amp; scale</span><span class="badge plat">Power BI + Tableau</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> SkyBridge has 50 regional hub managers, each of whom should see the same route-performance dashboard but filtered only to their own hub — Sydney sees Sydney, Dubai sees Dubai, and neither can see the other's numbers.</div>
+    <div class="content-body">
+      The naive solution — clone the dashboard 50 times and set a hard-coded filter on each — is a maintenance disaster. One schema change means 50 edits. One metric update requires 50 republishes.
+      <br><br>
+      Senior BI developers solve this with <b>Row-Level Security (RLS)</b>: a single dashboard with a dynamic filter that evaluates the identity of whoever is logged in at the moment they open it.
+      <ul>
+        <li><b>Power BI — Static RLS:</b> define roles in Power BI Desktop with a DAX filter expression per role (e.g., <code>[HubCode] = "SYD"</code>), then assign users or AD groups to each role in the Service.</li>
+        <li><b>Power BI — Dynamic RLS:</b> a single "Security" role whose DAX filter uses <code>USERPRINCIPALNAME()</code> to look up the current user's email against a mapping table that links employees to their permitted hub codes. One role, unlimited managers.</li>
+        <li><b>Tableau — Row-Level Security:</b> achieved via user filters, data source filters keyed to <code>USERNAME()</code>, or a dedicated entitlements table joined to the data.</li>
+      </ul>
+      <pre><code class="language-dax">-- Dynamic RLS filter expression applied to the Routes table
+[HubCode] IN
+    SELECTCOLUMNS (
+        FILTER (
+            ManagerPermissions,
+            ManagerPermissions[Email] = USERPRINCIPALNAME ()
+        ),
+        "Hub", ManagerPermissions[HubCode]
+    )</code></pre>
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Dynamic RLS scales to any number of users without touching the report — adding a new regional manager is a row in the permissions table, not a change in Power BI Desktop. The pattern that separates a senior BI developer from a junior one is this: juniors build 50 dashboards, seniors build one dashboard that knows who is looking at it.</div>
+  </div>
+</section>
+
+<!-- ============ LEVEL 4 ============ -->
+<section class="level" id="level4">
+  <div class="level-head">
+    <span class="lnum">LEVEL 04</span>
+    <h2>UX &amp; Visual Design Principles</h2>
+  </div>
+  <p class="level-sub">A technically correct, well-modeled dashboard can still fail if nobody can read it in the three seconds they're willing to give it. This level is about communication, not computation.</p>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">4.1 — The Data-Ink Ratio (Tufte)</div>
+      <div class="item-meta"><span class="badge tag">Design principle</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> A delay-tracking dashboard is covered in heavy gridlines, 3D bar effects, and drop shadows — stakeholders describe it as "hard to read" without being able to say exactly why.</div>
+    <div class="content-body">
+      Edward Tufte's <b>data-ink ratio</b> is the proportion of ink (or pixels) on a chart that directly encodes data, versus ink spent on decoration — borders, gridlines, backgrounds, redundant labels, 3D effects. The goal is to maximize that ratio without losing clarity.
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Before shipping a dashboard, do a deliberate pass removing every gridline, border, and background fill that doesn't encode information. If a chart looks identical — or clearer — after removing an element, that element was pure decoration and was competing with the data for the viewer's attention.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">4.2 — Pre-attentive Attributes &amp; Deliberate Color Use</div>
+      <div class="item-meta"><span class="badge tag">Design principle</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> On a route map showing 40 routes, executives can't quickly spot which ones are underperforming.</div>
+    <div class="content-body">
+      Pre-attentive attributes — color, size, position — are processed by the eye before conscious thought. Use one saturated highlight color (e.g., red) for the routes below profitability threshold, and a single neutral gray for everything else, rather than a full categorical rainbow palette.
+    </div>
+    <div class="swatch-row">
+      <div class="swatch" style="background:#C23B33;">Underperforming route — the one thing to notice first</div>
+      <div class="swatch" style="background:#8B98A6;">All other routes — neutral, recedes</div>
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Reserve saturated color for the one thing you want a viewer to notice first. A map where every route gets its own bright color makes nothing stand out — it's the visual equivalent of shouting every word in a sentence.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">4.3 — Layout &amp; Visual Hierarchy</div>
+      <div class="item-meta"><span class="badge tag">Design principle</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Users say they "can't find" the KPI they care about most on a dense operations dashboard, even though it's technically on the page.</div>
+    <div class="content-body">
+      For left-to-right readers, eyes tend to land top-left first (an F- or Z-pattern reading flow). Place the single most important KPI there, group related visuals with consistent alignment, and use whitespace deliberately to separate sections instead of relying on borders.
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Design every dashboard to answer the one question its primary user has in the first three seconds, then let them drill down for the rest. If the most-viewed KPI is buried bottom-right, that's a layout defect — not something a user-training session will fix.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">4.4 — The Dual-Axis Trap</div>
+      <div class="item-meta"><span class="badge tag">Design principle</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> A chart plots delay minutes and passenger count on a dual-axis line chart, and leadership keeps reading meaning into the point where the two lines cross.</div>
+    <div class="content-body">
+      Dual axes with independent scales can be positioned to make two unrelated metrics appear correlated, simply by adjusting each axis's range. The visual "crossing point" of two independently-scaled lines carries no real statistical meaning.
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>A dual-axis chart is defensible for at most two closely related, similarly-scaled metrics. The moment someone in the room reads meaning into where two independently-scaled lines cross, the chart has become misleading. When in doubt, split the two metrics into stacked small-multiple charts sharing one x-axis instead.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">4.5 — Report Tooltips &amp; Drill-throughs: Clean Surface, Deep Dive on Demand</div>
+      <div class="item-meta"><span class="badge tag">Design principle</span><span class="badge plat">Power BI + Tableau</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> The route-performance dashboard is clean and executive-ready, but the operations team also wants to hover over any bar and immediately see that route's delay breakdown by cause, aircraft model, and hour of day — without navigating away or opening a second report.</div>
+    <div class="content-body">
+      The tension in dashboard design is between <b>clarity</b> (a clean, uncluttered surface) and <b>depth</b> (all the contextual data an analyst needs). Report tooltips and drill-throughs resolve that tension without compromise.
+      <br><br>
+      <b>Report Tooltips (hover):</b> a hidden report page is designated as a tooltip. When a user hovers over any data point — a bar, a map marker, a scatter point — a fully rendered mini-chart canvas appears instead of the default text tooltip. A bar for the SYD–MEL route can reveal a sparkline of that route's 12-month delay trend, a breakdown donut by delay cause, and a count of affected passengers, all without any navigation.
+      <br><br>
+      <b>Drill-through (right-click → navigate):</b> a dedicated detail page is configured to accept a filter context from any other page. Right-clicking a bar and selecting "Drill through → Route Detail" passes the selected route into a full-page deep-dive — flight-by-flight log, crew assignments, weather flags — with a back-button to return to the summary.
+      <br><br>
+      Together these two patterns implement the <b>Overview → Detail</b> design principle that Tufte calls "zoom and filter": the dashboard's job is to surface the anomaly; the tooltip or drill-through page is the answer to "why?"
+    </div>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>A custom report tooltip is the purest expression of the data-ink ratio in interaction design: the summary dashboard stays clean because the detail lives on hover, not on the canvas. If you find yourself adding a second or third chart to a dashboard page to "give context" to the first, stop — you probably need a tooltip page, not more visuals competing for the same space.</div>
+  </div>
+</section>
+
+<footer>
+  Built for a Data Analyst → Principal BI Developer track. Business context (SkyBridge Airlines) is illustrative — swap in your own schema and the patterns hold across Power BI and Tableau alike.
+</footer>
+
+<script>hljs.highlightAll();</script>
+</body>
+</html>

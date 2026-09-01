@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Applied Statistics — Data Analyst Cheat Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #0E1B2E;
+  --navy2:  #162336;
+  --navy3:  #1E3048;
+  --teal:   #00C2A8;
+  --teal-d: #009E88;
+  --teal-t: rgba(0,194,168,0.10);
+  --amber:  #F5A623;
+  --amber-t:#FEF3DC;
+  --coral:  #E8524A;
+  --coral-t:#FDECEA;
+  --violet: #8B72E0;
+  --violet-t: rgba(139,114,224,0.10);
+  --ink:    #0E1B2E;
+  --ink2:   #3A4A5C;
+  --muted:  #6B7A8D;
+  --line:   #DDE2E8;
+  --bg:     #F8F7F4;
+  --surface:#FFFFFF;
+  --code-bg:#0E1B2E;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.65;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: var(--navy);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  padding: 28px 0 40px;
+  flex-shrink: 0;
+}
+.sidebar-brand {
+  padding: 0 22px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 20px;
+}
+.sidebar-brand .label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.8px;
+  color: var(--teal);
+  display: block;
+  margin-bottom: 5px;
+}
+.sidebar-brand h1 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+}
+.nav-section {
+  padding: 0 14px 6px;
+}
+.nav-section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  padding: 0 8px;
+  margin-bottom: 4px;
+  margin-top: 18px;
+}
+.nav-section a {
+  display: block;
+  padding: 6px 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1.4;
+}
+.nav-section a:hover,
+.nav-section a.active {
+  background: rgba(0,194,168,0.12);
+  color: var(--teal);
+}
+
+/* ── Main ── */
+.main {
+  flex: 1;
+  max-width: 860px;
+  padding: 52px 52px 80px 52px;
+  overflow-x: hidden;
+}
+
+/* ── Page header ── */
+.page-header {
+  margin-bottom: 56px;
+  padding-bottom: 32px;
+  border-bottom: 2px solid var(--navy);
+}
+.page-header .eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--teal-d);
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 10px;
+}
+.page-header h2 {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  color: var(--navy);
+  margin-bottom: 14px;
+}
+.page-header p {
+  font-size: 15px;
+  color: var(--ink2);
+  max-width: 600px;
+  line-height: 1.7;
+}
+
+/* ── Section ── */
+.section {
+  margin-bottom: 64px;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1.5px solid var(--line);
+}
+.section-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--teal);
+  background: var(--teal-t);
+  padding: 3px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.section-header h3 {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: -0.2px;
+}
+
+/* ── Concept block ── */
+.concept {
+  margin-bottom: 26px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.concept-head {
+  padding: 14px 20px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.concept-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+.concept-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+.tag-teal   { background: var(--teal-t); color: var(--teal-d); }
+.tag-amber  { background: var(--amber-t); color: #8A5E0A; }
+.tag-coral  { background: var(--coral-t); color: #B03028; }
+.tag-violet { background: var(--violet-t); color: #5B3DB5; }
+.tag-navy   { background: rgba(14,27,46,0.07); color: var(--navy2); }
+
+.concept-body { padding: 14px 20px 16px; }
+.concept-body p { font-size: 14px; color: var(--ink2); margin-bottom: 10px; line-height: 1.65; }
+.concept-body p:last-child { margin-bottom: 0; }
+
+/* ── Business block ── */
+.biz-block {
+  background: #F0FAF8;
+  border: 1px solid rgba(0,194,168,0.25);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin: 12px 0;
+}
+.biz-block .biz-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--teal-d);
+  display: block;
+  margin-bottom: 5px;
+}
+.biz-block p {
+  font-size: 13.5px;
+  color: #1A4A42;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Tip block ── */
+.tip-block {
+  background: var(--amber-t);
+  border-left: 3px solid var(--amber);
+  border-radius: 0 6px 6px 0;
+  padding: 11px 16px;
+  margin: 12px 0;
+}
+.tip-block .tip-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--amber);
+  display: block;
+  margin-bottom: 4px;
+}
+.tip-block p {
+  font-size: 13.5px;
+  color: #5C3C06;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Caution block ── */
+.caution-block {
+  background: var(--coral-t);
+  border-left: 3px solid var(--coral);
+  border-radius: 0 6px 6px 0;
+  padding: 11px 16px;
+  margin: 12px 0;
+}
+.caution-block .caution-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--coral);
+  display: block;
+  margin-bottom: 4px;
+}
+.caution-block p {
+  font-size: 13.5px;
+  color: #7A1F1B;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Formula ── */
+.formula {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  background: var(--code-bg);
+  color: #7EFFF5;
+  padding: 12px 18px;
+  border-radius: 6px;
+  margin: 12px 0;
+  overflow-x: auto;
+  line-height: 1.7;
+}
+.formula .comment { color: #5A7A8A; }
+
+/* ── Stat grid ── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 14px 0;
+}
+.stat-cell {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 13px 14px;
+}
+.stat-cell .stat-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--teal-d);
+  margin-bottom: 5px;
+}
+.stat-cell .stat-def {
+  font-size: 12.5px;
+  color: var(--ink2);
+  line-height: 1.55;
+}
+.stat-cell .stat-when {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+
+/* ── Decision table ── */
+.dtable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  margin: 14px 0;
+}
+.dtable th {
+  background: var(--navy);
+  color: #fff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 10px 14px;
+  text-align: left;
+  letter-spacing: 0.3px;
+}
+.dtable th:first-child { border-radius: 6px 0 0 0; }
+.dtable th:last-child  { border-radius: 0 6px 0 0; }
+.dtable td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  line-height: 1.55;
+  color: var(--ink2);
+}
+.dtable tr:nth-child(even) td { background: #F8FAFA; }
+.dtable td:first-child { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--navy); font-weight: 600; }
+
+/* ── AB test flow ── */
+.ab-flow {
+  display: flex;
+  gap: 0;
+  margin: 16px 0;
+  overflow-x: auto;
+}
+.ab-step {
+  flex: 1;
+  min-width: 110px;
+  padding: 14px 12px;
+  background: var(--surface);
+  border-top: 3px solid var(--teal);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.ab-step:first-child { border-left: 1px solid var(--line); border-radius: 6px 0 0 6px; }
+.ab-step:last-child  { border-right: 1px solid var(--line); border-radius: 0 6px 6px 0; }
+.ab-step-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--teal);
+  margin-bottom: 5px;
+}
+.ab-step-title { font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.ab-step-body  { font-size: 11.5px; color: var(--muted); line-height: 1.55; }
+
+/* ── Checklist ── */
+.checklist-section {
+  background: var(--navy);
+  border-radius: 10px;
+  padding: 30px 32px;
+  margin-top: 8px;
+}
+.checklist-section h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+.checklist-section .cl-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 22px;
+  line-height: 1.55;
+}
+.cl-group { margin-bottom: 22px; }
+.cl-group-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 1.3px;
+  color: var(--teal);
+  margin-bottom: 10px;
+}
+.cl-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.cl-item:hover { background: rgba(255,255,255,0.04); }
+.cl-item input[type="checkbox"] {
+  width: 16px; height: 16px;
+  accent-color: var(--teal);
+  flex-shrink: 0;
+  margin-top: 2px;
+  cursor: pointer;
+}
+.cl-item-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.55;
+  flex: 1;
+}
+.cl-item-text .cl-sub-note {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  display: block;
+  margin-top: 2px;
+}
+.cl-item.checked .cl-item-text { color: rgba(255,255,255,0.35); text-decoration: line-through; }
+.cl-progress {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cl-progress-bar {
+  flex: 1; height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.cl-progress-fill {
+  height: 100%;
+  background: var(--teal);
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+.cl-progress-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--teal);
+  flex-shrink: 0;
+}
+.cl-reset {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+.cl-reset:hover { color: rgba(255,255,255,0.6); }
+
+/* ── Two col ── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+
+/* ── Dist card ── */
+.dist-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 14px 16px;
+}
+.dist-card .dist-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+.dist-card .dist-biz {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-style: italic;
+}
+.dist-card .dist-when {
+  font-size: 12.5px;
+  color: var(--ink2);
+  line-height: 1.55;
+}
+.dist-card .dist-flag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--teal-d);
+  background: var(--teal-t);
+  padding: 2px 7px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-top: 7px;
+}
+
+/* ── Inline code ── */
+code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  background: rgba(14,27,46,0.07);
+  color: var(--navy2);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+ul.dot-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+}
+ul.dot-list li {
+  padding: 3px 0 3px 16px;
+  font-size: 13.5px;
+  color: var(--ink2);
+  line-height: 1.6;
+  position: relative;
+}
+ul.dot-list li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: var(--teal);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+@media (max-width: 860px) {
+  .sidebar { display: none; }
+  .main { padding: 32px 24px 60px; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .two-col { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="label">Cheat Sheet</span>
+    <h1>Applied Statistics for Data Analysts</h1>
+  </div>
+
+  <nav>
+    <div class="nav-section">
+      <div class="nav-section-label">Foundations</div>
+      <a href="#desc">Descriptive Statistics</a>
+      <a href="#dist">Probability Distributions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Testing</div>
+      <a href="#ab">A/B Testing Framework</a>
+      <a href="#hyp">Hypothesis Testing</a>
+      <a href="#ttest">t-Tests &amp; ANOVA</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Relationships</div>
+      <a href="#corr">Correlation vs. Causation</a>
+      <a href="#corr">Simpson's Paradox</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">ML Readiness</div>
+      <a href="#feat">Feature Engineering Stats</a>
+      <a href="#checklist">Pre-Model Checklist</a>
+    </div>
+  </nav>
+</aside>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<main class="main">
+
+  <div class="page-header">
+    <span class="eyebrow">ml-readiness · predictive modeling · business application</span>
+    <h2>Applied Statistics Cheat Sheet</h2>
+    <p>Business-first reference for data analysts moving toward machine learning. Every concept is tied to a real business problem. Skip the academic proofs — focus on what to use, when, and what breaks if you use it wrong.</p>
+  </div>
+
+
+  <!-- ══ SECTION 1: DESCRIPTIVE STATS ══ -->
+  <section class="section" id="desc">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h3>Descriptive Statistics</h3>
+    </div>
+
+    <div class="concept">
+      <div class="concept-head">
+        <div class="concept-title">Central Tendency — Mean, Median, Mode</div>
+        <div class="concept-meta">
+          <span class="tag tag-teal">ML Signal</span>
+          <span class="tag tag-navy">Baseline</span>
+        </div>
+      </div>
+      <div class="concept-body">
+        <div class="stat-grid">
+          <div class="stat-cell">
+            <div class="stat-name">MEAN</div>
+            <div class="stat-def">Sum ÷ count. Sensitive to outliers — one extreme value shifts it.</div>
+            <div class="stat-when">Use when: data is symmetric, no extreme outliers.</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-name">MEDIAN</div>
+            <div class="stat-def">Middle value when sorted. Robust to outliers. Always prefer for skewed data.</div>
+            <div class="stat-when">Use when: income, price, time-to-event data.</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-name">MODE</div>
+            <div class="stat-def">Most frequent value. The only central metric for categorical data.</div>
+            <div class="stat-when">Use when: category imputation, retail product demand.</div>
+          </div>
+        </div>
+        <div class="biz-block">
+          <span class="biz-label">Business Problem — E-commerce</span>
+          <p>Your average order value (AOV) is ₹1,840 — but median order is ₹620. Mean is inflated by a handful of bulk B2B orders. Report median to ops, use mean only for revenue forecasting where the outliers are real and recurring.</p>
+        </div>
+        <div class="tip-block">
+          <span class="tip-label">Analyst Tip</span>
+          <p>Before feeding a feature to a model, always compare mean vs. median. If they diverge by more than 20%, your feature is skewed and likely needs a log transform or outlier treatment before training.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <div class="concept-head">
+        <div class="concept-title">Spread — Variance, Standard Deviation, IQR</div>
+        <div class="concept-meta">
+          <span class="tag tag-teal">Outlier Detection</span>
+          <span class="tag tag-teal">Feature Scaling</span>
+        </div>
+      </div>
+      <div class="concept-body">
+        <div class="formula">
+σ² = Σ(xᵢ - μ)² / N          <span class="comment"># Variance — average squared distance from mean</span>
+σ  = √σ²                      <span class="comment"># Std Dev — same unit as your data</span>
+IQR = Q3 - Q1                 <span class="comment"># Interquartile range — middle 50% of data</span>
+Outlier threshold: x &lt; Q1 - 1.5×IQR  or  x &gt; Q3 + 1.5×IQR
+        </div>
+        <div class="biz-block">
+          <span class="biz-label">Business Problem — Logistics</span>
+          <p>Delivery time has σ = 2.1 days. Operations wants a "reliable" SLA. Set it at mean + 2σ and you cover ~97.5% of deliveries. High std dev also signals your model needs delivery_region as a feature — some routes are inherently unpredictable.</p>
+        </div>
+        <div class="tip-block">
+          <span class="tip-label">Analyst Tip</span>
+          <p>Low variance in a feature = low predictive value. A column where 95% of rows have the same value adds almost no signal to a model. Flag and potentially drop it before training.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <div class="concept-head">
+        <div class="concept-title">Skewness &amp; Kurtosis — Shape of Distribution</div>
+        <div class="concept-meta">
+          <span class="tag tag-amber">Transform Signal</span>
+          <span class="tag tag-teal">ML Readiness</span>
+        </div>
+      </div>
+      <div class="concept-body">
+        <div class="formula">
+Skewness &gt; 1 or &lt; -1  → heavily skewed, consider log/sqrt transform
+Kurtosis &gt; 3           → heavy tails, more extreme outliers than normal
+        </div>
+        <div class="two-col">
+          <div class="dist-card">
+            <div class="dist-name">Right Skew (positive)</div>
+            <div class="dist-biz">Income, price, transaction value, session length</div>
+            <div class="dist-when">Long tail on the right. Mean &gt; median. Apply <code>log(x + 1)</code> transform before using in linear models.</div>
+          </div>
+          <div class="dist-card">
+            <div class="dist-name">Left Skew (negative)</div>
+            <div class="dist-biz">Test scores, customer satisfaction, age at retirement</div>
+            <div class="dist-when">Long tail on the left. Median &gt; mean. Reflect then log-transform, or use quantile binning.</div>
+          </div>
+        </div>
+        <div class="caution-block">
+          <span class="caution-label">Do Not Ignore This</span>
+          <p>Linear regression assumes normally distributed residuals — not normally distributed features. But highly skewed features distort the residuals anyway. Always check skewness of key numeric features before modeling, not after.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <div class="concept-head">
+        <div class="concept-title">Percentiles &amp; Z-Scores — Contextualizing a Number</div>
+        <div class="concept-meta">
+          <span class="tag tag-teal">Normalization</span>
+          <span class="tag tag-navy">Benchmarking</span>
+        </div>
+      </div>
+      <div class="concept-body">
+        <div class="formula">
+Z = (x - μ) / σ        <span class="comment"># How many std deviations from the mean?</span>
+|Z| &gt; 3              → likely outlier
+Percentile rank       → "this customer spends more than 87% of your base"
+        </div>
+        <div class="biz-block">
+          <span class="biz-label">Business Problem — SaaS / Product Analytics</span>
+          <p>A user's session time is 42 minutes. Alone that's meaningless. Z-score of +2.3 means they're in the top ~1% of engaged users — that's your power user segment. This is how you build a "high-engagement" binary feature for a churn model.</p>
+        </div>
+        <div class="tip-block">
+          <span class="tip-label">Analyst Tip</span>
+          <p>Z-score normalization (standardization) is required before feeding numeric features to distance-based models like KNN or SVM, and before PCA. Tree-based models (Random Forest, XGBoost) do not require it — they split on rank, not magnitude.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ SECTION 2: DISTRIBUTIONS ══ -->
+  <section class="section" id="dist">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h3>Probability Distributions — Business Use Cases</h3>
+    </div>
+
+    <p style="font-size:14px; color:var(--ink2); margin-bottom:18px; line-height:1.65;">You don't need to derive these. You need to recognize which one fits your data and what that tells you about the business problem — and which ML models assume which distribution.</p>
+
+    <div class="two-col">
+      <div class="dist-card">
+        <div class="dist-name">Normal (Gaussian)</div>
+        <div class="dist-biz">Height, measurement error, aggregated financial returns</div>
+        <div class="dist-when">Bell curve. Mean = median = mode. Most linear models assume your residuals follow this. Central Limit Theorem makes averages of large samples normal even if the underlying data isn't.</div>
+        <div class="dist-flag">Linear Regression · t-tests · ANOVA</div>
+      </div>
+      <div class="dist-card">
+        <div class="dist-name">Log-Normal</div>
+        <div class="dist-biz">Revenue, transaction value, time-on-site, stock prices</div>
+        <div class="dist-when">Right-skewed; log transform makes it normal. If your revenue data looks like a hockey stick, it's log-normal. Log(revenue) is often a better model feature than raw revenue.</div>
+        <div class="dist-flag">Apply log transform before linear models</div>
+      </div>
+      <div class="dist-card">
+        <div class="dist-name">Binomial</div>
+        <div class="dist-biz">Click / no-click, converted / not, churned / retained</div>
+        <div class="dist-when">n independent trials, each either success or failure. Foundation for A/B testing on conversion rates. Logistic regression is the modeling equivalent — it models the probability of the binary outcome.</div>
+        <div class="dist-flag">Logistic Regression · A/B Test</div>
+      </div>
+      <div class="dist-card">
+        <div class="dist-name">Poisson</div>
+        <div class="dist-biz">Support tickets/hour, orders/day, defects/batch, app crashes</div>
+        <div class="dist-when">Count of events in a fixed interval when events are rare and independent. Mean = variance. If variance >> mean, you have overdispersion — use Negative Binomial instead.</div>
+        <div class="dist-flag">Count Regression · Anomaly Detection</div>
+      </div>
+      <div class="dist-card">
+        <div class="dist-name">Exponential</div>
+        <div class="dist-biz">Time between customer purchases, time until churn, machine failure intervals</div>
+        <div class="dist-when">Time between Poisson events. Memoryless — the probability of the next event doesn't depend on how long you've already waited. Foundation for survival analysis / time-to-event models.</div>
+        <div class="dist-flag">Survival Analysis · Lifetime Value</div>
+      </div>
+      <div class="dist-card">
+        <div class="dist-name">Uniform</div>
+        <div class="dist-biz">Random assignment in experiments, hash-based user bucketing</div>
+        <div class="dist-when">All values equally likely. Used to assign users to A/B groups. If your "random" assignment isn't uniform, your test is biased from day one — always verify group balance before analyzing results.</div>
+        <div class="dist-flag">Experiment Design · Sampling</div>
+      </div>
+    </div>
+
+    <div class="tip-block" style="margin-top:10px;">
+      <span class="tip-label">Analyst Tip — Distribution Fingerprinting</span>
+      <p>In Python: <code>df['col'].hist(bins=50)</code> gives you the shape. Then <code>scipy.stats.normaltest()</code> tests normality formally. If p &lt; 0.05, the data is not normal — transform or pick the right model before proceeding.</p>
+    </div>
+  </section>
+
+
+  <!-- ══ SECTION 3: A/B TESTING ══ -->
+  <section class="section" id="ab">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h3>A/B Testing Framework</h3>
+    </div>
+
+    <div class="concept">
+      <div class="concept-head">
+        <div class="concept-title">The 7-Step A/B Test Process — Never Skip a Step</div>
+        <div class="concept-meta"><span class="tag tag-teal">Experimentation</span></div>
+      </div>
+      <div class="concept-body">
+        <div class="ab-flow">
+          <div class="ab-step">
+            <div class="ab-step-num">01</div>
+            <div class="ab-step-title">Define Metric</div>
+            <div class="ab-step-body">One primary metric. Conversion rate, revenue/user, retention D7. Don't change it mid-test.</div>
+          </div>
+          <div class="ab-step">
+            <div class="ab-step-num">02</div>
+            <div class="ab-step-title">State Hypothesis</div>
+            <div class="ab-step-body">H₀: no difference. H₁: variant B has higher conversion. Be directional if you have a reason.</div>
+          </div>
+          <div class="ab-step">
+            <div class="ab-step-num">03</div>
+            <div class="ab-step-title">Set α &amp; Power</div>
+            <div class="ab-step-body">α = 0.05 (5% false positive risk). Power = 0.80 (80% chance to detect a real effect).</div>
+          </div>
+          <div class="ab-step">
+            <div class="ab-step-num">04</div>
+            <div class="ab-step-title">Calculate Sample Size</div>
+            <div class="ab-step-body">Use a power calculator. Smaller expected effect = more users needed. Do not skip this.</div>
+          </div>
+          <div class="ab-step">
+            <div class="ab-step-num">05</div>
+            <div class="ab-step-title">Run the Test</div>
+            <div class="ab-step-body">Random assignment. Do not peek at results before hitting target sample size.</div>
+          </div>
+          <div class="ab-step">
+            <div class="ab-step-num">06</div>
+            <div class="ab-step-title">Analyze</div>
+            <div class="ab-step-body">t-test for means, z-test for proportions. Compute p-value and confidence interval.</div>
+          </div>
+          <div class="ab-step">
+            <div class="ab-step-num">07</div>
+            <div class="ab-step-title">Decide &amp; Ship</div>
+            <div class="ab-step-body">p &lt; α and effect is practically significant? Ship B. Never ship on statistical significance alone.</div>
+          </div>
+        </div>
+        <div class="biz-block">
+          <span class="biz-label">Business Problem — Fintech App</span>
+          <p>You want to test a new onboarding flow. Primary metric: 7-day activation rate. Baseline: 34%. Minimum detectable effect: +3 percentage points. At 80% power, α=0.05 → you need ~2,400 users per group. Run for full weeks (not days) to avoid day-of-week bias. After 14 days: p=0.031, new flow = 37.4% activation. Ship it — but also check if the effect holds for mobile vs. desktop segments.</p>
+        </div>
+        <div class="caution-block">
+          <span class="caution-label">The Peeking Problem</span>
+          <p>Checking results daily and stopping when p &lt; 0.05 inflates your false positive rate from 5% to ~40% over 20 peeks. Commit to a stopping rule before the experiment starts, or use Sequential testing / Bayesian methods if you need early stopping.</p>
+        </div>
+        <div class="concept" style="margin:16px 0 4px; border-color: var(--coral); border-left-width: 3px;">
+          <div class="concept-head" style="background: var(--coral-t);">
+            <div class="concept-title" style="color:var(--coral);">⚠ The Multiple Comparisons Problem — One Test, One Metric</div>
+            <div class="concept-meta"><span class="tag tag-coral">Watch Out</span><span class="tag tag-amber">PM Pressure</span></div>
+          </div>
+          <div class="concept-body">
+            <p style="margin-bottom:10px;">Every time you run an additional significance test at α = 0.05, you accept a 5% chance of a false positive. Run 20 tests and you're near-certain to find at least one "significant" result purely by chance.</p>
+            <div class="formula">
+P(at least one false positive) = 1 - (1 - α)^n
+n = 20 tests at α = 0.05  →  1 - (0.95)²⁰ = <span style="color:#F5A623; font-weight:600;">64% false positive risk</span>
+            </div>
+            <div class="biz-block">
+              <span class="biz-label">Business Problem — Product A/B Test</span>
+              <p>Your PM asks you to check 20 secondary metrics after the experiment: clicks, scroll depth, time on page, hover rate, share rate... You find that "average scroll depth" is significant at p = 0.03. Congratulations — that is almost certainly noise. With 20 metrics tested, you expect one false positive just from luck, and scroll depth was never in your pre-registered hypothesis. The fix: declare your primary metric and 2–3 guardrail metrics <em>before</em> the test runs. Everything else is exploratory, not conclusive.</p>
+            </div>
+            <div class="tip-block">
+              <span class="tip-label">Analyst Tip — How to Handle It</span>
+              <p><strong>Bonferroni correction:</strong> divide your α threshold by the number of tests. Testing 5 metrics? Use α = 0.01 per test instead of 0.05. More conservative but simple. Alternatively, use the <strong>Benjamini-Hochberg procedure</strong> to control the False Discovery Rate — less punishing than Bonferroni and more appropriate when you're doing exploratory metric sweeps.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ SECTION 4: HYPOTHESIS TESTING ══ -->
+  <section class="section" id="hyp">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h3>Hypothesis Testing — p-values Done Right</h3>
+    </div>
+
+    <div class="concept">
+      <div class="concept-head">
+        <div class="concept-title">p-value — What It Actually Means</div>
+        <div class="concept-meta"><span class="tag tag-coral">Most Misused Concept</span></div>
+      </div>
+      <div class="concept-body">
+        <div class="formula">
+p-value = P(observed data | H₀ is true)
+
+NOT: probability that H₀ is true
+NOT: probability the result happened by chance
+YES: how surprising is this result, assuming nothing is going on?
+        </div>
+        <ul class="dot-list">
+          <li><strong>p &lt; 0.05:</strong> if H₀ were true, you'd see a result this extreme less than 5% of the time. Reject H₀.</li>
+          <li><strong>p = 0.03:</strong> statistically significant. Does NOT mean the effect is large or business-relevant.</li>
+          <li><strong>p = 0.20:</strong> insufficient evidence to reject H₀. Does NOT prove H₀ is true.</li>
+        </ul>
+        <div class="biz-block">
+          <span class="biz-label">Business Problem — Retail Pricing</span>
+          <p>You test a price discount. p = 0.002 (very significant). Lift in conversion: +0.4%. With 50,000 daily users, that's 200 more conversions — but the discount costs ₹15/conversion in margin. Net: −₹3,000/day. Statistical significance without business significance = a wrong decision. Always report effect size and confidence interval alongside p-value.</p>
+        </div>
+        <div class="tip-block">
+          <span class="tip-label">Analyst Tip — Report This Instead</span>
+          <p>Never report just the p-value. Always show: <strong>(1)</strong> effect size (the actual difference), <strong>(2)</strong> 95% confidence interval, <strong>(3)</strong> practical significance (does this move a business metric meaningfully?). A p-value is a gate — not an answer.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ SECTION 5: T-TESTS & ANOVA ══ -->
+  <section class="section" id="ttest">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h3>t-Tests &amp; ANOVA — Choosing the Right Test</h3>
+    </div>
+
+    <table class="dtable">
+      <thead>
+        <tr>
+          <th>Test</th>
+          <th>When to Use</th>
+          <th>Business Example</th>
+          <th>Key Assumption</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>One-sample t-test</td>
+          <td>Compare one group's mean to a fixed benchmark</td>
+          <td>"Is our avg delivery time significantly different from the 3-day SLA?"</td>
+          <td>Approx. normal distribution or n &gt; 30</td>
+        </tr>
+        <tr>
+          <td>Two-sample t-test</td>
+          <td>Compare means of two independent groups</td>
+          <td>"Does Group A (new email) spend more than Group B (control)?"</td>
+          <td>Independence, approx. normal, similar variance (check with Levene's test)</td>
+        </tr>
+        <tr>
+          <td>Paired t-test</td>
+          <td>Same subjects measured twice (before/after)</td>
+          <td>"Did our training program increase sales rep output, comparing each rep to themselves?"</td>
+          <td>Differences between pairs are normally distributed</td>
+        </tr>
+        <tr>
+          <td>One-way ANOVA</td>
+          <td>Compare means across 3+ independent groups</td>
+          <td>"Which of our 4 pricing tiers drives highest avg order value?"</td>
+          <td>Normality per group, equal variance (Bartlett's test), independence</td>
+        </tr>
+        <tr>
+          <td>Two-way ANOVA</td>
+          <td>Two categorical factors + their interaction</td>
+          <td>"Does the effect of discount size on conversion differ by customer segment?"</td>
+          <td>Same as one-way, plus balanced design is preferred</td>
+        </tr>
+        <tr>
+          <td>Welch's t-test</td>
+          <td>Two groups with unequal variances</td>
+          <td>A/B test where control group is 10× larger than variant (unequal n)</td>
+          <td>More robust than Student's t — default to this for most A/B tests</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="concept">
+      <div class="concept-head">
+        <div class="concept-title">ANOVA — What Significance Actually Tells You</div>
+        <div class="concept-meta"><span class="tag tag-amber">Common Mistake</span></div>
+      </div>
+      <div class="concept-body">
+        <div class="formula">
+F = Variance between groups / Variance within groups
+
+F &gt;&gt; 1  →  group means differ more than expected by chance
+p &lt; 0.05 → at least one group is different. But which one?
+        </div>
+        <div class="caution-block">
+          <span class="caution-label">ANOVA Does Not Tell You Which Groups Differ</span>
+          <p>A significant ANOVA F-test only tells you <em>some</em> group is different. You need a post-hoc test to find which pairs. Use <strong>Tukey's HSD</strong> for all pairwise comparisons, or <strong>Bonferroni correction</strong> when you have specific hypotheses — but you must plan which comparisons before seeing the data, not after.</p>
+        </div>
+        <div class="biz-block">
+          <span class="biz-label">Business Problem — Marketing Channels</span>
+          <p>You have 4 acquisition channels (paid search, organic, referral, direct). ANOVA on LTV: p = 0.003. Tukey HSD reveals: referral vs. direct is the only significant pair (referral LTV is +₹4,200 higher). Paid search and organic are not meaningfully different. Now you know where to reallocate budget — without ANOVA followed by post-hoc, you'd have reacted to noise.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ SECTION 6: CORRELATION VS CAUSATION ══ -->
+  <section class="section" id="corr">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h3>Correlation vs. Causation</h3>
+    </div>
+
+    <div class="concept">
+      <div class="concept-head">
+        <div class="concept-title">Correlation Coefficients — Reading the Number</div>
+        <div class="concept-meta"><span class="tag tag-teal">Feature Selection</span></div>
+      </div>
+      <div class="concept-body">
+        <div class="formula">
+Pearson r    → linear relationship between two continuous variables (-1 to +1)
+Spearman ρ  → rank-based, works for non-linear monotonic relationships
+Kendall τ   → rank concordance, better for small samples and many ties
+
+|r| &lt; 0.1   : negligible    |r| 0.1–0.3 : weak
+|r| 0.3–0.5 : moderate      |r| &gt; 0.5   : strong
+        </div>
+        <div class="biz-block">
+          <span class="biz-label">Business Problem — HR Analytics</span>
+          <p>Pearson r between "hours of training" and "performance score" = 0.62. Strong positive correlation. But before recommending more training: check if top performers are simply assigned more training (reverse causality), or if a third variable (department, manager quality) drives both. Correlation finds the signal. Causation requires design or domain logic.</p>
+        </div>
+        <div class="tip-block">
+          <span class="tip-label">Analyst Tip — Correlation for Feature Selection</span>
+          <p>Features with |r| &gt; 0.9 to each other are multicollinear — they're measuring the same thing. Drop or combine them before linear regression (use VIF — Variance Inflation Factor — to formally test). Tree-based models are less sensitive to this but still wasteful. Target correlation: features with |r| ≈ 0.3–0.7 to the target variable are your best bets for signal.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <div class="concept-head">
+        <div class="concept-title">Causation Frameworks — When Correlation Isn't Enough</div>
+        <div class="concept-meta"><span class="tag tag-violet">Decision Making</span></div>
+      </div>
+      <div class="concept-body">
+        <table class="dtable">
+          <thead>
+            <tr><th>Method</th><th>Business Context</th><th>Use When</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A/B Test (RCT)</td>
+              <td>Product changes, pricing, marketing copy</td>
+              <td>You can randomly assign users. Gold standard for causation.</td>
+            </tr>
+            <tr>
+              <td>Difference-in-Differences</td>
+              <td>Policy rollout, regional promotions</td>
+              <td>Treatment rolled out to one group, not another. Compare change in both.</td>
+            </tr>
+            <tr>
+              <td>Regression Discontinuity</td>
+              <td>Loyalty tier upgrades, credit score cutoffs</td>
+              <td>Eligibility determined by threshold — compare just above vs. just below.</td>
+            </tr>
+            <tr>
+              <td>Instrumental Variables</td>
+              <td>Pricing strategy, ad exposure effects</td>
+              <td>Use an external variable that affects treatment but not outcome directly.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="caution-block">
+          <span class="caution-label">The Classic Business Trap</span>
+          <p>"Users who engage with 5+ features have 3× lower churn." This is correlation — engaged users were already committed. Forcing all users to engage with 5 features does not cause lower churn. Always ask: is this driven by selection bias? What type of user self-selects into this behavior?</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <div class="concept-head">
+        <div class="concept-title">Simpson's Paradox — When Aggregates Lie</div>
+        <div class="concept-meta">
+          <span class="tag tag-coral">Dangerous Pattern</span>
+          <span class="tag tag-violet">Segmentation</span>
+        </div>
+      </div>
+      <div class="concept-body">
+        <p>A trend appears in every individual subgroup of your data — but <strong>reverses or disappears</strong> when you look at the combined total. This is Simpson's Paradox, and it is one of the most common ways that correct-looking aggregate analyses lead to wrong business decisions.</p>
+        <div class="biz-block">
+          <span class="biz-label">Business Problem — E-commerce Conversion</span>
+          <p>Overall site conversion rate dropped from 4.2% to 3.8% month-over-month. The team panics. But segment it: <strong>Mobile conversion went up</strong> (3.1% → 3.4%) and <strong>Desktop conversion also went up</strong> (6.8% → 7.1%). Both channels improved. The aggregate fell because the traffic mix shifted — mobile visits grew from 55% to 72% of total traffic, and mobile converts at a lower absolute rate than desktop. The product got better. The channel mix changed. Reporting only the aggregate would have triggered a wrong investigation.</p>
+        </div>
+        <div class="formula">
+<span class="comment"># Simulated example — mix shift causing aggregate reversal</span>
+Month 1:  Mobile  55% of traffic × 3.1% CVR  +  Desktop 45% × 6.8% CVR  =  <span style="color:#F5A623">4.2% overall</span>
+Month 2:  Mobile  72% of traffic × 3.4% CVR  +  Desktop 28% × 7.1% CVR  =  <span style="color:#E8524A">3.8% overall</span>
+
+Both segments improved. Aggregate fell. The mix is the story.
+        </div>
+        <div class="tip-block">
+          <span class="tip-label">Analyst Tip — How to Catch It</span>
+          <p>Whenever you report a change in an aggregate metric (conversion, churn, AOV, NPS), immediately segment by the key stratifying variable — device, channel, geography, cohort, pricing tier. If the aggregate tells a different story than the segments, you have a mix-shift problem, not a performance problem. In SQL: always <code>GROUP BY segment</code> before you trust a <code>GROUP BY month</code>.</p>
+        </div>
+        <div class="caution-block">
+          <span class="caution-label">Where It Appears Most</span>
+          <p>Medical trial results aggregated across hospitals with different patient severity profiles. Marketing ROI aggregated across channels with different deal sizes. HR diversity metrics aggregated across departments with different hiring volumes. Any time you aggregate across groups with different underlying compositions, Simpson's Paradox is a risk. Segment first, aggregate second.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ SECTION 7: FEATURE ENGINEERING STATS ══ -->
+  <section class="section" id="feat">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h3>Feature Engineering Statistics</h3>
+    </div>
+
+    <div class="concept">
+      <div class="concept-head">
+        <div class="concept-title">Transformations — Fixing Skewed Features</div>
+        <div class="concept-meta"><span class="tag tag-teal">ML Readiness</span><span class="tag tag-amber">Transform</span></div>
+      </div>
+      <div class="concept-body">
+        <table class="dtable">
+          <thead>
+            <tr><th>Situation</th><th>Transform</th><th>Business Column Example</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Heavy right skew, all positive values</td>
+              <td><code>log(x + 1)</code></td>
+              <td>revenue, pageviews, session_duration</td>
+            </tr>
+            <tr>
+              <td>Right skew, moderate</td>
+              <td><code>sqrt(x)</code></td>
+              <td>support_tickets_count, days_since_signup</td>
+            </tr>
+            <tr>
+              <td>Left skew</td>
+              <td><code>x²</code> or reflect then log</td>
+              <td>percentage_task_complete (skewed high)</td>
+            </tr>
+            <tr>
+              <td>Need values in [0,1] range</td>
+              <td>Min-Max scaling: <code>(x - min) / (max - min)</code></td>
+              <td>For KNN, Neural Networks, SVM</td>
+            </tr>
+            <tr>
+              <td>Need mean 0, std 1</td>
+              <td>Z-score: <code>(x - μ) / σ</code></td>
+              <td>For Linear/Logistic Regression, PCA</td>
+            </tr>
+            <tr>
+              <td>Heavy outliers you can't remove</td>
+              <td>Robust scaling: <code>(x - median) / IQR</code></td>
+              <td>income, age (with data entry errors)</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="tip-block">
+          <span class="tip-label">Analyst Tip</span>
+          <p>Fit scalers on training data ONLY. Apply the same fitted scaler to validation and test sets. If you fit on the full dataset, you've leaked test information into the training process — your reported accuracy is optimistic and your model will underperform in production.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <div class="concept-head">
+        <div class="concept-title">Handling Outliers — Detect, Decide, Then Act</div>
+        <div class="concept-meta"><span class="tag tag-coral">Data Quality</span></div>
+      </div>
+      <div class="concept-body">
+        <div class="formula">
+IQR Method:   flag if x &lt; Q1 - 1.5×IQR  or  x &gt; Q3 + 1.5×IQR
+Z-score Method: flag if |Z| &gt; 3
+Isolation Forest: statistical method for multivariate outliers
+        </div>
+        <table class="dtable">
+          <thead>
+            <tr><th>Outlier Type</th><th>Action</th><th>Why</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Data entry error (age = 999)</td>
+              <td>Remove or impute</td>
+              <td>Not a real observation — it poisons the model</td>
+            </tr>
+            <tr>
+              <td>Genuine extreme (whale customer, ₹50L order)</td>
+              <td>Keep + segment flag</td>
+              <td>Real signal — consider a separate model for this segment</td>
+            </tr>
+            <tr>
+              <td>Outlier in target variable (revenue)</td>
+              <td>Log-transform target</td>
+              <td>Reduces influence without discarding real data</td>
+            </tr>
+            <tr>
+              <td>Outlier in feature column</td>
+              <td>Winsorize: cap at 1st/99th percentile</td>
+              <td>Preserves the observation, limits distortion</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="concept">
+      <div class="concept-head">
+        <div class="concept-title">Missing Data — MAR, MCAR, MNAR</div>
+        <div class="concept-meta"><span class="tag tag-coral">Data Quality</span><span class="tag tag-teal">Imputation</span></div>
+      </div>
+      <div class="concept-body">
+        <div class="two-col">
+          <div class="dist-card">
+            <div class="dist-name">MCAR — Missing Completely at Random</div>
+            <div class="dist-biz">Survey response dropped due to network error</div>
+            <div class="dist-when">Missingness unrelated to any variable. Safe to drop rows or use mean/median imputation.</div>
+            <div class="dist-flag">Drop rows · Mean impute</div>
+          </div>
+          <div class="dist-card">
+            <div class="dist-name">MAR — Missing at Random</div>
+            <div class="dist-biz">Income field missing for younger users</div>
+            <div class="dist-when">Missingness related to other observed variables. Use model-based imputation (KNN, iterative imputer) using age, tenure, etc. as predictors.</div>
+            <div class="dist-flag">KNN Impute · Iterative Impute</div>
+          </div>
+          <div class="dist-card">
+            <div class="dist-name">MNAR — Missing Not at Random</div>
+            <div class="dist-biz">High earners skipping the income field</div>
+            <div class="dist-when">Missingness is related to the missing value itself. Most dangerous. Create a binary "is_missing" indicator feature — the absence itself is signal for your model.</div>
+            <div class="dist-flag">Missingness Indicator Feature</div>
+          </div>
+          <div class="dist-card">
+            <div class="dist-name">Categorical Missingness</div>
+            <div class="dist-biz">Product category not set, city unknown</div>
+            <div class="dist-when">Fill with "Unknown" as an explicit category — don't impute mode unless you have strong domain reason. "Unknown" can itself be a predictive category (e.g., users who skipped onboarding).</div>
+            <div class="dist-flag">Explicit "Unknown" Category</div>
+          </div>
+        </div>
+        <div class="caution-block">
+          <span class="caution-label">Never Do This</span>
+          <p>Do not drop columns with &gt;30% missing without first checking if the missingness itself is informative. A "time_to_first_purchase" field that's null for 40% of users usually means they never purchased — that null IS the data point. Dropping the column loses your most predictive churn signal.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ SECTION 8: CHECKLIST ══ -->
+  <section class="section" id="checklist">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h3>Pre-Model Assumption Checklist</h3>
+    </div>
+
+    <p style="font-size:14px; color:var(--ink2); margin-bottom:20px; line-height:1.65;">Run through every item below before feeding transformed data into an algorithm. Check off each one as you verify it. A model trained on unchecked data is a model waiting to fail in production.</p>
+
+    <div class="concept" style="margin-bottom:24px; border-left: 3px solid var(--coral);">
+      <div class="concept-head" style="background:var(--coral-t);">
+        <div class="concept-title" style="color:var(--coral);">The Class Imbalance Metric Trap — Accuracy Is Lying to You</div>
+        <div class="concept-meta">
+          <span class="tag tag-coral">Most Dangerous Mistake</span>
+          <span class="tag tag-navy">Classification Models</span>
+        </div>
+      </div>
+      <div class="concept-body">
+        <p>When your target class is rare — fraud, disease, churn in a low-churn product, equipment failure — <strong>accuracy becomes a useless metric</strong> that actively hides a broken model.</p>
+        <div class="formula">
+<span class="comment"># Fraud detection dataset: 99% legitimate, 1% fraud</span>
+Model A: predicts "Not Fraud" for every single transaction
+Accuracy = 99%  ←  <span style="color:#E8524A; font-weight:600;">looks great. catches zero fraud.</span>
+
+Model B: catches 80% of fraud, misclassifies 5% of legitimate
+Accuracy = 94.2%  ←  <span style="color:#00C2A8; font-weight:600;">looks worse. actually useful.</span>
+        </div>
+        <table class="dtable" style="margin-top:12px;">
+          <thead>
+            <tr><th>Metric</th><th>What It Answers</th><th>Use When</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Precision</td>
+              <td>Of all predicted positives, how many are actually positive?</td>
+              <td>False positives are costly — e.g., wrongly flagging a customer as fraudulent and blocking their card</td>
+            </tr>
+            <tr>
+              <td>Recall (Sensitivity)</td>
+              <td>Of all actual positives, how many did the model find?</td>
+              <td>False negatives are costly — e.g., missing a real fraud case or failing to detect a disease</td>
+            </tr>
+            <tr>
+              <td>F1 Score</td>
+              <td>Harmonic mean of Precision and Recall</td>
+              <td>You need to balance both — no strong business reason to favour one error type</td>
+            </tr>
+            <tr>
+              <td>AUC-ROC</td>
+              <td>How well does the model rank positives above negatives across all thresholds?</td>
+              <td>Comparing models; works well unless imbalance is severe (&gt;100:1), then use PR-AUC</td>
+            </tr>
+            <tr>
+              <td>Accuracy</td>
+              <td>Overall fraction correct</td>
+              <td><strong style="color:var(--coral)">Only</strong> when classes are roughly balanced (less than 3:1 ratio)</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="biz-block">
+          <span class="biz-label">Business Problem — Insurance Fraud Detection</span>
+          <p>Your fraud model hits 98.7% accuracy. The product team is thrilled. Then you check: your fraud recall is 11% — you're catching barely 1 in 10 actual fraud cases. The model learned to say "not fraud" almost always, because that's the 98.7% base rate. Fix: switch your evaluation metric to F1 or PR-AUC, use <code>class_weight='balanced'</code> in sklearn, and consider SMOTE to oversample the minority class before training.</p>
+        </div>
+        <div class="tip-block">
+          <span class="tip-label">Analyst Tip — The Threshold Question</span>
+          <p>Classification models output a probability, not a hard label. The 0.5 decision threshold is an arbitrary default. For a fraud model, lowering the threshold to 0.3 catches more fraud (higher recall) at the cost of more false alarms (lower precision). Plot the Precision-Recall curve and pick the threshold based on the business cost ratio of a missed fraud vs. a false positive — don't let sklearn's default choose it for you.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="checklist-section">
+      <h4>Pre-Model Data Validation Checklist</h4>
+      <p class="cl-sub">Tick off each assumption as you verify it. All items must pass before training begins.</p>
+
+      <div class="cl-progress">
+        <div class="cl-progress-bar"><div class="cl-progress-fill" id="prog-fill" style="width:0%"></div></div>
+        <span class="cl-progress-text" id="prog-text">0 / 18</span>
+        <button class="cl-reset" onclick="resetAll()">reset</button>
+      </div>
+
+      <div class="cl-group">
+        <div class="cl-group-label">Data Shape &amp; Quality</div>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">No data leakage — target variable information is not present in features
+            <span class="cl-sub-note">e.g., "refund_flag" should not be a feature in a churn model if it's set at the same time as churn</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Train/validation/test split done before any transformation or encoding
+            <span class="cl-sub-note">Scalers, encoders, and imputers must be fit on training data only</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Target variable distribution is understood — class imbalance ratio documented for classification problems
+            <span class="cl-sub-note">Imbalance &gt;10:1 → never use accuracy. Use F1, PR-AUC, or Recall as primary metric. Consider SMOTE + class_weight='balanced'</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Missing values handled — strategy documented per column (imputed / dropped / encoded as indicator)
+            <span class="cl-sub-note">Check MCAR vs. MAR vs. MNAR. Never silently drop columns without investigation.</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Outliers identified and decision made — remove, cap (winsorize), transform, or flag
+            <span class="cl-sub-note">Document the decision — "we winsorized revenue at 99th percentile" is a model assumption</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Duplicate rows removed or explicitly kept with justification</span>
+        </label>
+      </div>
+
+      <div class="cl-group">
+        <div class="cl-group-label">Feature Distribution &amp; Scale</div>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Skewness checked for all numeric features — |skew| &gt; 1 treated with log/sqrt/Box-Cox transform
+            <span class="cl-sub-note">Required for linear regression, logistic regression, and linear SVM</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Features scaled appropriately for the algorithm being used
+            <span class="cl-sub-note">KNN / SVM / Neural net → z-score or min-max. Tree-based → no scaling needed.</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Categorical variables encoded — OHE for nominal, ordinal encoding for ordered categories
+            <span class="cl-sub-note">High-cardinality columns (&gt;50 unique values) → use target encoding or frequency encoding</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Date/time features extracted — no raw timestamps as features
+            <span class="cl-sub-note">Extract: day_of_week, hour_of_day, days_since_event, month, is_weekend</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="cl-group">
+        <div class="cl-group-label">Linear Model–Specific Assumptions</div>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Linearity: relationship between each feature and the target is approximately linear
+            <span class="cl-sub-note">Check with scatter plots or partial regression plots. Nonlinear? Add polynomial term or use tree-based model.</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">No multicollinearity — VIF &lt; 5 for all features in a linear model
+            <span class="cl-sub-note">Correlated features inflate coefficient variance, making interpretation unreliable</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Residuals are approximately normally distributed (check QQ plot after fitting)
+            <span class="cl-sub-note">Formal test: Shapiro-Wilk (n &lt; 50) or Kolmogorov-Smirnov (large n)</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Homoscedasticity: residual variance is roughly constant across predicted values
+            <span class="cl-sub-note">Fan-shaped residual plot = heteroscedasticity. Fix: transform target (log), or use robust standard errors</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="cl-group">
+        <div class="cl-group-label">Experiment &amp; Test Validity</div>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Sample size verified against power calculation before experiment launch
+            <span class="cl-sub-note">Minimum detectable effect, α = 0.05, power = 0.80 → computed required n per group</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">A/B groups confirmed to be balanced on key pre-treatment variables
+            <span class="cl-sub-note">Run a t-test on age, tenure, country distribution — p should be > 0.05 (no pre-existing difference)</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Statistical test chosen matches data type and comparison being made
+            <span class="cl-sub-note">Proportions → z-test. Means, 2 groups → t-test. Means, 3+ groups → ANOVA + post-hoc.</span>
+          </span>
+        </label>
+        <label class="cl-item" onclick="tick(this)">
+          <input type="checkbox">
+          <span class="cl-item-text">Effect size and confidence interval reported alongside p-value
+            <span class="cl-sub-note">Cohen's d for means, odds ratio for proportions. p &lt; 0.05 is not a complete answer.</span>
+          </span>
+        </label>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  function tick(label) {
+    const cb = label.querySelector('input[type=checkbox]');
+    // Don't re-toggle — the checkbox event fires first
+    setTimeout(() => {
+      if (cb.checked) label.classList.add('checked');
+      else label.classList.remove('checked');
+      updateProgress();
+    }, 0);
+  }
+
+  function updateProgress() {
+    const all = document.querySelectorAll('.cl-item input[type=checkbox]');
+    const done = [...all].filter(cb => cb.checked).length;
+    const pct = Math.round((done / all.length) * 100);
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-text').textContent = done + ' / ' + all.length;
+  }
+
+  function resetAll() {
+    document.querySelectorAll('.cl-item').forEach(el => {
+      el.classList.remove('checked');
+      el.querySelector('input').checked = false;
+    });
+    updateProgress();
+  }
+
+  // Sidebar active link highlight on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-section a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const link = document.querySelector(`.nav-section a[href="#${entry.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { threshold: 0.2 });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

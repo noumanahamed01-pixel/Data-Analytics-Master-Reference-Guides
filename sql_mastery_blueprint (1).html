@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The SQL Fluency Ladder — Meridian Retail Co.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+<style>
+  :root{
+    --bg:#F5F7F8;
+    --surface:#FFFFFF;
+    --ink:#0F1B22;
+    --ink-soft:#4B5D66;
+    --line:#E1E7E9;
+    --teal:#0E7C86;
+    --teal-deep:#0A5B63;
+    --teal-tint:#E4F2F1;
+    --amber:#B45309;
+    --amber-tint:#FEF3E2;
+    --amber-line:#F0B860;
+    --code-bg:#0B1420;
+    --low:#0E8A45;
+    --low-tint:#E5F5EC;
+    --med:#B4740E;
+    --med-tint:#FBF0DC;
+    --high:#C23B33;
+    --high-tint:#FBE9E7;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.65;
+  }
+  h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; margin:0; color:var(--ink);}
+  code, pre, .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:var(--teal-deep);}
+
+  /* ---------- Nav ---------- */
+  .navbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:6px;
+    padding:14px 28px;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+  .navbar .brand{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px;
+    color:var(--teal-deep); margin-right:18px; letter-spacing:0.2px;
+  }
+  .navbar a{
+    text-decoration:none; color:var(--ink-soft); font-size:13.5px; font-weight:600;
+    padding:7px 12px; border-radius:20px; transition:background .15s, color .15s;
+  }
+  .navbar a:hover{background:var(--teal-tint); color:var(--teal-deep);}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    max-width:920px; margin:0 auto; padding:64px 28px 40px;
+  }
+  .eyebrow{
+    display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:1.4px;
+    text-transform:uppercase; color:var(--teal-deep); background:var(--teal-tint);
+    padding:6px 12px; border-radius:20px; margin-bottom:18px;
+  }
+  .hero h1{
+    font-size:44px; line-height:1.12; font-weight:700; letter-spacing:-0.5px;
+    max-width:760px;
+  }
+  .hero p.lede{
+    font-size:17.5px; color:var(--ink-soft); max-width:640px; margin-top:18px;
+  }
+
+  /* difficulty ladder — signature element */
+  .ladder{
+    display:flex; gap:10px; margin-top:36px; max-width:760px;
+  }
+  .rung{
+    flex:1; padding:14px 16px; border-radius:10px; border:1px solid var(--line);
+    background:var(--surface); position:relative; overflow:hidden;
+  }
+  .rung::before{
+    content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
+  }
+  .rung.l1::before{background:#5FB3AE;}
+  .rung.l2::before{background:#3E9C99;}
+  .rung.l3::before{background:#1F7E82;}
+  .rung.l4::before{background:#0A5B63;}
+  .rung.l5::before{background:#5B3FA0;}
+  .rung .num{font-size:11px; font-weight:700; color:var(--ink-soft); letter-spacing:1px;}
+  .rung .lab{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px; margin-top:3px;}
+
+  /* ---------- Schema section ---------- */
+  .schema-wrap{max-width:920px; margin:0 auto; padding:8px 28px 56px;}
+  .schema-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:28px 30px;
+  }
+  .schema-card h3{font-size:19px; margin-bottom:6px;}
+  .schema-card p{color:var(--ink-soft); font-size:14.5px; margin:6px 0 18px;}
+  .tbl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; margin-bottom:20px;}
+  .tbl-chip{
+    border:1px solid var(--line); border-radius:8px; padding:10px 12px; background:#FBFCFC;
+  }
+  .tbl-chip .tname{font-weight:700; font-size:13.5px; color:var(--teal-deep); font-family:'JetBrains Mono',monospace;}
+  .tbl-chip .tcols{font-size:12px; color:var(--ink-soft); margin-top:4px; line-height:1.5;}
+
+  /* ---------- Section shell ---------- */
+  .level{
+    max-width:920px; margin:0 auto; padding:10px 28px 10px;
+  }
+  .level-head{
+    display:flex; align-items:baseline; gap:16px; margin:56px 0 8px;
+    border-bottom:2px solid var(--ink); padding-bottom:14px;
+  }
+  .level-head .lnum{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; color:var(--teal-deep);
+    letter-spacing:1px;
+  }
+  .level-head h2{font-size:26px;}
+  .level-sub{color:var(--ink-soft); font-size:14.5px; margin:6px 0 30px; max-width:680px;}
+
+  /* ---------- Item card ---------- */
+  .item{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    margin-bottom:22px; overflow:hidden;
+  }
+  .item-head{
+    padding:18px 24px 4px;
+  }
+  .item-title{font-size:17px; font-weight:700; font-family:'Space Grotesk',sans-serif;}
+  .item-meta{display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap;}
+  .badge{
+    font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; letter-spacing:.3px;
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .badge::before{content:''; width:6px; height:6px; border-radius:50%; display:inline-block;}
+  .badge.low{background:var(--low-tint); color:var(--low);}
+  .badge.low::before{background:var(--low);}
+  .badge.med{background:var(--med-tint); color:var(--med);}
+  .badge.med::before{background:var(--med);}
+  .badge.high{background:var(--high-tint); color:var(--high);}
+  .badge.high::before{background:var(--high);}
+
+  .scenario{
+    padding:6px 24px 16px; color:var(--ink-soft); font-size:14.5px;
+  }
+  .scenario b{color:var(--ink); font-weight:600;}
+
+  pre{
+    margin:0; padding:18px 24px; background:var(--code-bg); overflow-x:auto;
+    font-size:13px; line-height:1.6;
+  }
+  pre code.hljs{background:transparent; padding:0;}
+
+  .tip{
+    margin:0; padding:14px 24px; background:var(--amber-tint);
+    border-top:1px solid var(--amber-line);
+    font-size:14px; color:#6B3A08;
+  }
+  .tip .tip-lab{
+    font-weight:700; color:var(--amber); font-size:11.5px; letter-spacing:.6px;
+    text-transform:uppercase; display:block; margin-bottom:5px;
+  }
+
+  /* ---------- Optimization comparison table ---------- */
+  .compare{width:100%; border-collapse:collapse; font-size:13.5px; margin:14px 0 4px;}
+  .compare th, .compare td{border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top;}
+  .compare th{background:#F1F5F5; font-family:'Space Grotesk',sans-serif; font-size:12.5px;}
+  .compare code{background:#EEF2F2; padding:1px 5px; border-radius:4px; font-size:12px;}
+
+  .footnote{
+    margin:0; padding:10px 24px 16px; background:#F6F8F8; color:var(--ink-soft);
+    font-size:12.5px; border-top:1px dashed var(--line);
+  }
+  .footnote b{color:var(--ink);}
+
+  .badge.tag{background:#EFEAFB; color:#5B3FA0;}
+  .badge.tag::before{background:#5B3FA0;}
+
+  footer{
+    max-width:920px; margin:40px auto 70px; padding:24px 28px; border-top:1px solid var(--line);
+    color:var(--ink-soft); font-size:13px;
+  }
+
+  @media (max-width:640px){
+    .hero h1{font-size:32px;}
+    .ladder{flex-wrap:wrap;}
+    .rung{min-width:130px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <span class="brand">SQL FLUENCY LADDER</span>
+  <a href="#schema">Schema</a>
+  <a href="#level1">L1 · Foundations</a>
+  <a href="#level2">L2 · Joins</a>
+  <a href="#level3">L3 · Analytical SQL</a>
+  <a href="#level4">L4 · Optimization</a>
+  <a href="#level5">L5 · Orchestration</a>
+</nav>
+
+<section class="hero">
+  <span class="eyebrow">Analyst → Senior Data Engineer</span>
+  <h1>The SQL Fluency Ladder</h1>
+  <p class="lede">A progressive reference built around one running business — <b>Meridian Retail Co.</b>, a mid-size e-commerce retailer. Every command is tied to a real reporting request, and every block carries a Senior Consultant Tip aimed at the habit that separates an analyst who writes correct SQL from one who writes SQL that survives production data volumes.</p>
+
+  <div class="ladder">
+    <div class="rung l1"><div class="num">LEVEL 01</div><div class="lab">Foundations</div></div>
+    <div class="rung l2"><div class="num">LEVEL 02</div><div class="lab">Relational Joins</div></div>
+    <div class="rung l3"><div class="num">LEVEL 03</div><div class="lab">Analytical SQL</div></div>
+    <div class="rung l4"><div class="num">LEVEL 04</div><div class="lab">Optimization</div></div>
+    <div class="rung l5"><div class="num">LEVEL 05</div><div class="lab">Orchestration</div></div>
+  </div>
+</section>
+
+<section class="schema-wrap" id="schema">
+  <div class="schema-card">
+    <h3>The Business: Meridian Retail Co.</h3>
+    <p>A multi-region e-commerce retailer. Every example below queries this schema — the same seven tables an analyst on this team would actually touch daily.</p>
+    <div class="tbl-grid">
+      <div class="tbl-chip"><div class="tname">customers</div><div class="tcols">customer_id · customer_name · region_id · signup_date · customer_segment</div></div>
+      <div class="tbl-chip"><div class="tname">regions</div><div class="tcols">region_id · region_name · country</div></div>
+      <div class="tbl-chip"><div class="tname">employees</div><div class="tcols">employee_id · employee_name · manager_id · department · hire_date</div></div>
+      <div class="tbl-chip"><div class="tname">products</div><div class="tcols">product_id · product_name · category · unit_price</div></div>
+      <div class="tbl-chip"><div class="tname">orders</div><div class="tcols">order_id · customer_id · employee_id · order_date · status</div></div>
+      <div class="tbl-chip"><div class="tname">order_items</div><div class="tcols">order_item_id · order_id · product_id · quantity · discount_pct</div></div>
+      <div class="tbl-chip"><div class="tname">campaigns</div><div class="tcols">campaign_id · campaign_name · start_date · channel</div></div>
+    </div>
+    <pre><code class="language-sql">CREATE TABLE customers (
+  customer_id      INT PRIMARY KEY,
+  customer_name    VARCHAR(100),
+  region_id        INT,
+  signup_date      DATE,
+  customer_segment VARCHAR(20)   -- 'Enterprise' | 'SMB' | 'Consumer'
+);
+
+CREATE TABLE orders (
+  order_id    INT PRIMARY KEY,
+  customer_id INT,
+  employee_id INT,
+  order_date  DATE,
+  status      VARCHAR(20)        -- 'Completed' | 'Cancelled' | 'Returned'
+);
+
+CREATE TABLE order_items (
+  order_item_id INT PRIMARY KEY,
+  order_id      INT,
+  product_id    INT,
+  quantity      INT,
+  discount_pct  DECIMAL(4,2)
+);</code></pre>
+  </div>
+</section>
+
+<!-- ============ LEVEL 1 ============ -->
+<section class="level" id="level1">
+  <div class="level-head">
+    <span class="lnum">LEVEL 01</span>
+    <h2>Foundations — Analyst Day One</h2>
+  </div>
+  <p class="level-sub">The commands you'll write dozens of times a day. Getting the habits right here — filtering before sorting, handling NULLs deliberately — is what makes the later levels easier to optimize.</p>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">SELECT · WHERE · ORDER BY · LIMIT</div>
+      <div class="item-meta"><span class="badge low">Query Cost: Low</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> The West region sales manager wants the 10 most recent completed orders to spot-check against a customer complaint.</div>
+    <pre><code class="language-sql">SELECT order_id, customer_id, order_date, status
+FROM orders
+WHERE status = 'Completed'
+ORDER BY order_date DESC
+LIMIT 10;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Name every column you need instead of SELECT * — even on a "throwaway" query. Cloud warehouses (Snowflake, BigQuery, Redshift) bill by bytes scanned or slot-time, so this habit, formed here, is what stops a 200-column customer table from quietly inflating your compute bill later.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">Aggregation: GROUP BY + HAVING</div>
+      <div class="item-meta"><span class="badge low">Query Cost: Low–Medium</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Finance wants total net revenue by product category, but only categories generating over $50,000, for a board slide.</div>
+    <pre><code class="language-sql">SELECT p.category,
+       SUM(oi.quantity * p.unit_price * (1 - oi.discount_pct)) AS net_revenue
+FROM order_items oi
+JOIN products p ON p.product_id = oi.product_id
+GROUP BY p.category
+HAVING SUM(oi.quantity * p.unit_price * (1 - oi.discount_pct)) > 50000
+ORDER BY net_revenue DESC;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>WHERE filters rows before aggregation; HAVING filters groups after. Never put a row-level predicate (like a date range) in HAVING — it forces the engine to aggregate the entire table first, then throw most of the work away.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">CASE WHEN — Conditional Bucketing</div>
+      <div class="item-meta"><span class="badge low">Query Cost: Low</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Marketing wants customers bucketed into tenure bands to target a loyalty campaign differently for new vs. long-standing accounts.</div>
+    <pre><code class="language-sql">SELECT customer_id,
+       customer_name,
+       CASE
+         WHEN signup_date >= DATEADD(month, -6, CURRENT_DATE) THEN 'New'
+         WHEN signup_date >= DATEADD(year, -2, CURRENT_DATE)  THEN 'Established'
+         ELSE 'Veteran'
+       END AS tenure_band
+FROM customers;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>CASE evaluates top to bottom and stops at the first true condition — order branches from most to least restrictive. Reversing this order is a common bug that silently misclassifies rows without ever throwing an error.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">NULL Handling — COALESCE &amp; IS NULL</div>
+      <div class="item-meta"><span class="badge low">Query Cost: Low</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> A discount report is showing blank cells because some order_items rows never had a discount applied (NULL, not zero).</div>
+    <pre><code class="language-sql">SELECT order_item_id,
+       COALESCE(discount_pct, 0) AS discount_pct_clean
+FROM order_items
+WHERE discount_pct IS NULL OR discount_pct = 0;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>SQL uses three-valued logic — NULL is never "equal to" anything, including another NULL. WHERE column = NULL always returns zero rows with no error. Use IS NULL / IS NOT NULL for comparisons and COALESCE to supply defaults before arithmetic.</div>
+  </div>
+</section>
+
+<!-- ============ LEVEL 2 ============ -->
+<section class="level" id="level2">
+  <div class="level-head">
+    <span class="lnum">LEVEL 02</span>
+    <h2>Relational Joins</h2>
+  </div>
+  <p class="level-sub">Almost no real report lives in one table. This is where an analyst starts thinking in relationships instead of spreadsheets.</p>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">INNER JOIN</div>
+      <div class="item-meta"><span class="badge low">Query Cost: Low–Medium</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Sales ops needs every completed order with the customer's name and region for a regional performance review.</div>
+    <pre><code class="language-sql">SELECT o.order_id, c.customer_name, r.region_name, o.order_date
+FROM orders o
+INNER JOIN customers c ON c.customer_id = o.customer_id
+INNER JOIN regions r ON r.region_id = c.region_id
+WHERE o.status = 'Completed';</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Cloud optimizers reorder joins for you, so hand-tuning join order rarely helps. What does help: join on raw, well-typed keys. Never wrap a join key in a function (e.g. CAST(a.id AS STRING) = b.id) — it blocks the engine from using partition or clustering metadata to skip data.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">LEFT JOIN — Anti-Join Pattern</div>
+      <div class="item-meta"><span class="badge low">Query Cost: Low–Medium</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Customer success wants every customer who has never placed a single order — a dormant/at-risk outreach list.</div>
+    <pre><code class="language-sql">SELECT c.customer_id, c.customer_name
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.customer_id
+WHERE o.order_id IS NULL;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>This "LEFT JOIN + IS NULL" shape is the standard anti-join for "exists in A but not B." Prefer it (or NOT EXISTS) over NOT IN — NOT IN silently returns zero rows for the entire query if the subquery contains even one NULL.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">RIGHT JOIN</div>
+      <div class="item-meta"><span class="badge low">Query Cost: Low–Medium</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> HR wants every employee listed, including ones not yet assigned any orders, alongside any orders they have processed.</div>
+    <pre><code class="language-sql">SELECT e.employee_name, o.order_id
+FROM orders o
+RIGHT JOIN employees e ON e.employee_id = o.employee_id;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>RIGHT JOIN is a mirrored LEFT JOIN — nothing it does is impossible with LEFT JOIN and swapped table order. Most teams standardize on LEFT JOIN only, so every join in the codebase reads in the same direction during review.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">FULL OUTER JOIN</div>
+      <div class="item-meta"><span class="badge high">Query Cost: High</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Data engineering is reconciling the CRM customer list against the billing system to find records missing on either side.</div>
+    <pre><code class="language-sql">SELECT COALESCE(crm.customer_id, bill.customer_id) AS customer_id,
+       crm.customer_name AS crm_name,
+       bill.customer_name AS billing_name
+FROM crm_customers crm
+FULL OUTER JOIN billing_customers bill ON bill.customer_id = crm.customer_id
+WHERE crm.customer_id IS NULL OR bill.customer_id IS NULL;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>FULL OUTER JOIN typically forces a full shuffle of both tables in distributed engines like BigQuery or Redshift. Reserve it for genuine two-system reconciliation jobs — not routine dashboards.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">SELF JOIN</div>
+      <div class="item-meta"><span class="badge low">Query Cost: Low</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> HR needs each employee listed next to their manager's name for an org directory export.</div>
+    <pre><code class="language-sql">SELECT e.employee_name AS employee, m.employee_name AS manager
+FROM employees e
+LEFT JOIN employees m ON m.employee_id = e.manager_id;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>A self-join only unrolls one level of hierarchy. For an arbitrary-depth org chart (a report's report's report), reach for a recursive CTE — see Level 3 — instead of chaining more self-joins.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">CROSS JOIN</div>
+      <div class="item-meta"><span class="badge med">Query Cost: Medium (row count multiplies)</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Marketing wants a planning matrix of every active paid-search campaign against every region, to allocate a geo-targeting budget before results exist.</div>
+    <pre><code class="language-sql">SELECT camp.campaign_name, r.region_name
+FROM campaigns camp
+CROSS JOIN regions r
+WHERE camp.channel = 'Paid Search';</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Row counts multiply (m × n) on a CROSS JOIN. On a warehouse billed by compute, an accidental cross join — usually a forgotten ON clause — is one of the most common causes of a runaway query bill. Sanity-check the expected row count before you run it.</div>
+  </div>
+</section>
+
+<!-- ============ LEVEL 3 ============ -->
+<section class="level" id="level3">
+  <div class="level-head">
+    <span class="lnum">LEVEL 03</span>
+    <h2>Advanced Analytical SQL</h2>
+  </div>
+  <p class="level-sub">CTEs, subqueries, and window functions — the toolkit that lets you answer "compare this row to its group" questions without exporting to a spreadsheet.</p>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">Basic CTE</div>
+      <div class="item-meta"><span class="badge med">Query Cost: Medium</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Build a readable two-step report: compute revenue per customer, then surface only the top spenders for account management review.</div>
+    <pre><code class="language-sql">WITH customer_revenue AS (
+  SELECT o.customer_id,
+         SUM(oi.quantity * p.unit_price) AS total_revenue
+  FROM orders o
+  JOIN order_items oi ON oi.order_id = o.order_id
+  JOIN products p ON p.product_id = oi.product_id
+  WHERE o.status = 'Completed'
+  GROUP BY o.customer_id
+)
+SELECT c.customer_name, cr.total_revenue
+FROM customer_revenue cr
+JOIN customers c ON c.customer_id = cr.customer_id
+WHERE cr.total_revenue > 10000
+ORDER BY cr.total_revenue DESC;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Name a CTE for what it represents ("customer_revenue," not "cte1") — it's documentation as much as logic. Don't assume it's materialized for performance: in most engines (Snowflake, BigQuery, pre-12 Postgres) a CTE is inlined and re-planned. Reference it five times in the outer query, and some engines will scan it five times.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">Chained CTEs</div>
+      <div class="item-meta"><span class="badge med">Query Cost: Medium</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Build a monthly active-customer cohort view, step by step, for a growth report.</div>
+    <pre><code class="language-sql">WITH monthly_orders AS (
+  SELECT customer_id, DATE_TRUNC('month', order_date) AS order_month, order_id
+  FROM orders
+  WHERE status = 'Completed'
+),
+first_purchase AS (
+  SELECT customer_id, MIN(order_month) AS cohort_month
+  FROM monthly_orders
+  GROUP BY customer_id
+)
+SELECT fp.cohort_month, COUNT(DISTINCT mo.customer_id) AS active_customers
+FROM monthly_orders mo
+JOIN first_purchase fp ON fp.customer_id = mo.customer_id
+GROUP BY fp.cohort_month
+ORDER BY fp.cohort_month;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Chained CTEs read top-to-bottom like a narrative — that's their real advantage over nested subqueries. Keep each CTE to one transformation; if you can't name it in three words, split it into two.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">Recursive CTE</div>
+      <div class="item-meta"><span class="badge med">Query Cost: Medium–High</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> HR needs the entire reporting chain — direct and indirect — under the VP of Sales for a reorg proposal.</div>
+    <pre><code class="language-sql">WITH RECURSIVE org_chain AS (
+  SELECT employee_id, employee_name, manager_id, 1 AS depth
+  FROM employees
+  WHERE employee_name = 'VP of Sales'
+
+  UNION ALL
+
+  SELECT e.employee_id, e.employee_name, e.manager_id, oc.depth + 1
+  FROM employees e
+  JOIN org_chain oc ON e.manager_id = oc.employee_id
+  WHERE oc.depth < 20
+)
+SELECT * FROM org_chain ORDER BY depth;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Always cap a recursive CTE with a safety condition (WHERE depth &lt; 20). A single circular manager reference from a data-entry error will otherwise spin an infinite loop against your warehouse's compute credits.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">Correlated Subquery — the pattern to recognize</div>
+      <div class="item-meta"><span class="badge high">Query Cost: High</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Flag orders whose value exceeds that customer's own historical average — a classic "compare each row to its own group" question.</div>
+    <pre><code class="language-sql">SELECT o.order_id, o.customer_id
+FROM orders o
+WHERE (SELECT SUM(oi.quantity * p.unit_price)
+       FROM order_items oi
+       JOIN products p ON p.product_id = oi.product_id
+       WHERE oi.order_id = o.order_id)
+      >
+      (SELECT AVG(inner_total)
+       FROM (SELECT SUM(oi2.quantity * p2.unit_price) AS inner_total
+             FROM orders o2
+             JOIN order_items oi2 ON oi2.order_id = o2.order_id
+             JOIN products p2 ON p2.product_id = oi2.product_id
+             WHERE o2.customer_id = o.customer_id) t);</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>This is correct, and it's also the exact anti-pattern flagged in Level 4. The inner subquery re-executes once per outer row. Keep reading — Section 4.3 rewrites this same business question as a single window-function pass.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">Window Functions — ROW_NUMBER, RANK, DENSE_RANK</div>
+      <div class="item-meta"><span class="badge med">Query Cost: Medium</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Sales leadership wants the top 3 highest-value orders per region for a quarterly spotlight, with ties handled correctly.</div>
+    <pre><code class="language-sql">SELECT *
+FROM (
+  SELECT o.order_id, r.region_name,
+         SUM(oi.quantity * p.unit_price) AS order_value,
+         RANK()       OVER (PARTITION BY r.region_name ORDER BY SUM(oi.quantity * p.unit_price) DESC) AS value_rank,
+         DENSE_RANK() OVER (PARTITION BY r.region_name ORDER BY SUM(oi.quantity * p.unit_price) DESC) AS dense_value_rank,
+         ROW_NUMBER() OVER (PARTITION BY r.region_name ORDER BY SUM(oi.quantity * p.unit_price) DESC) AS row_num
+  FROM orders o
+  JOIN customers c ON c.customer_id = o.customer_id
+  JOIN regions r ON r.region_id = c.region_id
+  JOIN order_items oi ON oi.order_id = o.order_id
+  JOIN products p ON p.product_id = oi.product_id
+  GROUP BY o.order_id, r.region_name
+) ranked
+WHERE row_num <= 3;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>RANK() leaves gaps after ties (1, 1, 3); DENSE_RANK() doesn't (1, 1, 2); ROW_NUMBER() never ties. Use ROW_NUMBER() for "exactly N per group" pagination; reach for RANK/DENSE_RANK only when the business genuinely cares about tie semantics, like a leaderboard.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">LEAD &amp; LAG — Period-over-Period Change</div>
+      <div class="item-meta"><span class="badge med">Query Cost: Medium</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> Finance wants month-over-month revenue change per region to flag declining markets before the quarterly review.</div>
+    <pre><code class="language-sql">SELECT region_name, order_month, monthly_revenue,
+       LAG(monthly_revenue) OVER (PARTITION BY region_name ORDER BY order_month) AS prev_month_revenue,
+       monthly_revenue - LAG(monthly_revenue) OVER (PARTITION BY region_name ORDER BY order_month) AS mom_change,
+       LEAD(monthly_revenue) OVER (PARTITION BY region_name ORDER BY order_month) AS next_month_revenue
+FROM regional_monthly_revenue;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>LEAD/LAG replace an older self-join-on-date-offset pattern. They're both more readable and materially cheaper — computed in a single sorted pass instead of a join.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">Running Totals &amp; Moving Averages</div>
+      <div class="item-meta"><span class="badge med">Query Cost: Medium</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> The ops dashboard needs a cumulative revenue line and a 7-day moving average to smooth out daily noise.</div>
+    <pre><code class="language-sql">SELECT order_date,
+       daily_revenue,
+       SUM(daily_revenue) OVER (ORDER BY order_date ROWS UNBOUNDED PRECEDING) AS running_total,
+       AVG(daily_revenue) OVER (ORDER BY order_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS moving_avg_7d
+FROM daily_revenue_summary
+ORDER BY order_date;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Always write the frame clause explicitly (ROWS BETWEEN…). The implicit default — RANGE UNBOUNDED PRECEDING — behaves unexpectedly with duplicate ORDER BY values, summing tied rows together. Say ROWS when you mean "this many physical rows."</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">3.8 — JSON &amp; Semi-Structured Data (UNNEST / FLATTEN)</div>
+      <div class="item-meta"><span class="badge med">Query Cost: Medium (row explosion possible)</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> The orders table stores each order's applied promo codes as a JSON array (<code class="mono">promotions_json</code>). Marketing wants one row per promotion actually used, to measure uptake per code.</div>
+    <pre><code class="language-sql">-- BigQuery
+SELECT o.order_id, promo AS promotion_code
+FROM orders o,
+UNNEST(JSON_VALUE_ARRAY(o.promotions_json)) AS promo;
+
+-- Snowflake
+SELECT o.order_id, promo.value::STRING AS promotion_code
+FROM orders o,
+LATERAL FLATTEN(input => PARSE_JSON(o.promotions_json)) AS promo;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>UNNEST/FLATTEN turn one row into many — an order with three promo codes becomes three rows. Decide before you aggregate whether a downstream metric (order count, revenue) should be computed at the order grain or the promotion grain; joining flattened output straight back into an order-level total is the most common way analysts accidentally triple-count revenue.</div>
+  </div>
+</section>
+
+<!-- ============ LEVEL 4 ============ -->
+<section class="level" id="level4">
+  <div class="level-head">
+    <span class="lnum">LEVEL 04</span>
+    <h2>Query Optimization for Enterprise Cloud Warehouses</h2>
+  </div>
+  <p class="level-sub">Everything above is correct SQL. This is where a senior data professional's judgment starts to matter — recognizing which correct query is also the one that survives 500M rows and a real compute bill.</p>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">4.1 — Reading Execution Plans</div>
+      <div class="item-meta"><span class="badge low">Diagnostic step — no data movement</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> A dashboard query that ran in 3 seconds last quarter now takes 45 seconds after a data volume increase. Diagnose it before escalating to the platform team.</div>
+    <pre><code class="language-sql">EXPLAIN
+SELECT o.order_id, c.customer_name
+FROM orders o
+JOIN customers c ON c.customer_id = o.customer_id
+WHERE o.order_date >= '2026-01-01';
+
+-- Snowflake:  EXPLAIN USING TEXT  or the Query Profile UI
+-- BigQuery:   the "Execution details" tab on a completed job
+-- Redshift:   EXPLAIN, cross-referenced with SVL_QUERY_SUMMARY</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Don't look for "does it use an index" — that's an on-prem mental model. In cloud MPP warehouses, check for: (1) full table scans where a partition or cluster filter should have pruned data, (2) a shuffle join on a multi-billion-row table where a broadcast join was expected, and (3) large gaps between estimated and actual row counts, which usually means stale table statistics.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">4.2 — Indexing Strategy, Reframed for Columnar Warehouses</div>
+      <div class="item-meta"><span class="badge med">Design-time decision</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> An analyst asks, "should I just add an index to make this query faster?" — on a Snowflake, BigQuery, or Redshift table.</div>
+    <pre><code class="language-sql">-- Traditional OLTP (PostgreSQL / MySQL) — a real B-tree index
+CREATE INDEX idx_orders_customer_date ON orders(customer_id, order_date);
+
+-- Snowflake — clustering key, not a B-tree index
+ALTER TABLE orders CLUSTER BY (order_date);
+
+-- BigQuery — partitioning + clustering, set at table creation
+CREATE TABLE orders
+PARTITION BY DATE(order_date)
+CLUSTER BY customer_id AS
+SELECT * FROM staging.orders;
+
+-- Redshift — distribution key + sort key
+CREATE TABLE orders (
+  order_id    INT,
+  customer_id INT,
+  order_date  DATE
+)
+DISTKEY(customer_id)
+SORTKEY(order_date);</code></pre>
+    <table class="compare">
+      <tr><th>Environment</th><th>Mechanism</th><th>What it optimizes</th></tr>
+      <tr><td>PostgreSQL / MySQL (OLTP)</td><td><code>CREATE INDEX</code> (B-tree)</td><td>Fast point lookups &amp; row-level access</td></tr>
+      <tr><td>Snowflake</td><td>Clustering key</td><td>Micro-partition pruning on scans</td></tr>
+      <tr><td>BigQuery</td><td>Partitioning + clustering</td><td>Bytes scanned (cost) &amp; pruning</td></tr>
+      <tr><td>Redshift</td><td>Dist key + sort key</td><td>Join co-location &amp; block skipping</td></tr>
+    </table>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>In columnar cloud warehouses, "indexing" mostly means designing partition and clustering keys around your most common filter and join columns — most of these engines don't support traditional B-tree indexes at all. Cluster on a high-cardinality column that appears in WHERE/JOIN constantly (like a date), not on a low-cardinality flag like status.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">4.3 — Rewriting a Correlated Subquery as a Window Function</div>
+      <div class="item-meta"><span class="badge low">Query Cost: Low (was High in 3.4)</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> The exact same question from Section 3.4 — orders that beat the customer's own average — but now it needs to run nightly against 50M+ rows without timing out.</div>
+    <pre><code class="language-sql">WITH order_totals AS (
+  SELECT o.order_id, o.customer_id,
+         SUM(oi.quantity * p.unit_price) AS order_value
+  FROM orders o
+  JOIN order_items oi ON oi.order_id = o.order_id
+  JOIN products p ON p.product_id = oi.product_id
+  GROUP BY o.order_id, o.customer_id
+),
+with_avg AS (
+  SELECT *,
+         AVG(order_value) OVER (PARTITION BY customer_id) AS customer_avg_value
+  FROM order_totals
+)
+SELECT order_id, customer_id, order_value, customer_avg_value
+FROM with_avg
+WHERE order_value > customer_avg_value;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>This is the single highest-leverage optimization habit for a senior analyst. A correlated subquery re-executes once per outer row — roughly O(n²) behavior. The window-function version computes the same aggregate in one pass per partition. On a 50M-row orders table, this is routinely the difference between a query that times out and one that finishes in seconds.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">4.4 — Predicate Pushdown &amp; Partition Pruning</div>
+      <div class="item-meta"><span class="badge high">Common silent cost</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> A "quick" query filtering to a single year is scanning the entire multi-year orders table instead of just 2026's partitions.</div>
+    <pre><code class="language-sql">-- Anti-pattern: wraps the partitioned column in a function — defeats pruning
+SELECT * FROM orders WHERE YEAR(order_date) = 2026;
+
+-- Sargable rewrite: direct range comparison, prunes partitions cleanly
+SELECT order_id, customer_id, order_date
+FROM orders
+WHERE order_date >= '2026-01-01' AND order_date < '2027-01-01';</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Any predicate that wraps the filter column in a function — YEAR(), CAST(), UPPER(), string concatenation — is "non-sargable." The optimizer can no longer use partition metadata or clustering to skip data, so it scans everything and filters row-by-row afterward. Rewrite filters as direct comparisons on the raw column wherever possible.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">4.5 — Column Pruning (Why SELECT * Is Expensive Here)</div>
+      <div class="item-meta"><span class="badge high">Common silent cost</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> A dashboard query pulls from a 200-column customer table, but the report only displays four fields.</div>
+    <pre><code class="language-sql">-- Costly: reads every column from disk in a columnar store
+SELECT * FROM customers WHERE customer_segment = 'Enterprise';
+
+-- Cheap: columnar engines only read the columns you name
+SELECT customer_id, customer_name, region_id, signup_date
+FROM customers
+WHERE customer_segment = 'Enterprise';</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Snowflake, BigQuery, and Redshift store data column-oriented, so SELECT * physically reads every column from disk even if the report only displays a handful. It's one of the most common — and easiest to fix — sources of both slow queries and inflated compute bills.</div>
+    <div class="footnote"><b>Footnote:</b> some modern optimizers can prune unused columns from a SELECT * written inside an intermediate CTE, once they see what the final outer SELECT actually references. Don't rely on this — it varies by engine and query shape, and it disappears the moment the CTE is materialized or reused elsewhere. Naming columns explicitly is still the safer default.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">4.6 — Materialized Views for Repeated Aggregations</div>
+      <div class="item-meta"><span class="badge med">Trades storage for speed</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> The executive dashboard re-runs the same expensive customer-revenue aggregation (from Section 3.1) dozens of times a day for nearly identical results.</div>
+    <pre><code class="language-sql">CREATE MATERIALIZED VIEW mv_customer_revenue AS
+SELECT o.customer_id,
+       SUM(oi.quantity * p.unit_price) AS total_revenue,
+       MAX(o.order_date) AS last_order_date
+FROM orders o
+JOIN order_items oi ON oi.order_id = o.order_id
+JOIN products p ON p.product_id = oi.product_id
+WHERE o.status = 'Completed'
+GROUP BY o.customer_id;</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span>Materialized views trade storage and refresh cost for query-time speed — right for stable, frequently-repeated aggregations feeding dashboards, wrong for ad-hoc exploratory analysis. Confirm your warehouse's refresh model (auto-incremental vs. full rebuild) before relying on one for near-real-time numbers.</div>
+  </div>
+</section>
+
+<!-- ============ LEVEL 5 ============ -->
+<section class="level" id="level5">
+  <div class="level-head">
+    <span class="lnum">LEVEL 05</span>
+    <h2>Orchestration &amp; Version Control</h2>
+  </div>
+  <p class="level-sub">A bonus level, past pure SQL syntax: how the queries above actually live in a modern data team. This is the shift from "an analyst who writes a query" to "an engineer who ships a model."</p>
+
+  <div class="item">
+    <div class="item-head">
+      <div class="item-title">5.1 — From Script to Governed Model (dbt / Dataform)</div>
+      <div class="item-meta"><span class="badge tag">Version-controlled · testable</span></div>
+    </div>
+    <div class="scenario"><b>Business ask:</b> The customer-value query from Section 4.3 keeps getting copy-pasted into new dashboards with small drifts. It needs to become one reusable, tested source of truth other analysts build on top of — not a file on someone's laptop.</div>
+    <pre><code class="language-sql">-- models/marts/fct_customer_order_value.sql  (dbt)
+
+WITH order_totals AS (
+  SELECT o.order_id, o.customer_id,
+         SUM(oi.quantity * p.unit_price) AS order_value
+  FROM {{ ref('orders') }} o
+  JOIN {{ ref('order_items') }} oi ON oi.order_id = o.order_id
+  JOIN {{ ref('products') }} p ON p.product_id = oi.product_id
+  GROUP BY o.order_id, o.customer_id
+)
+
+SELECT *,
+       AVG(order_value) OVER (PARTITION BY customer_id) AS customer_avg_value
+FROM order_totals</code></pre>
+    <div class="tip"><span class="tip-lab">Senior Consultant Tip</span><code class="mono">{{ ref('orders') }}</code> isn't cosmetic — it's what lets dbt (or Dataform's own <code class="mono">ref()</code>) build a dependency graph and run every model in the right order, and what lets the same code target a dev schema in testing and a prod schema in production without a single line changing. A hardcoded <code class="mono">FROM prod.orders</code> is the fastest way to make a model untestable and unsafe to refactor.</div>
+  </div>
+</section>
+
+<footer>
+  Built for a Data Analyst → Data Engineering track. Business context (Meridian Retail Co.) is illustrative — swap in your own schema and the patterns hold.
+</footer>
+
+<script>hljs.highlightAll();</script>
+</body>
+</html>
