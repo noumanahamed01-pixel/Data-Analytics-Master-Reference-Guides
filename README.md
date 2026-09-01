@@ -1,4 +1,4 @@
-# Data-Analytics-Master-Reference-Guides
+
 "A comprehensive suite of advanced reference guides for SQL, Python, BI, and Applied Statistics."
 
 # The Senior Data Analyst Playbook
