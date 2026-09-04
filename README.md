@@ -25,3 +25,4 @@ Click the links below to view the live, interactive documentation or download th
   * *Focus:* Object-Oriented API (`fig, ax`), custom subplot grids, despining, and high-ink-ratio formatting for stakeholder presentations.
 * **Seaborn & Advanced Plotting** *(Coming in the future)*
   * *Focus:* Statistical data visualization, distribution plots, correlation heatmaps, and automated aesthetic theme control.
+
