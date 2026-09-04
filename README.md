@@ -7,9 +7,9 @@ This repository contains my personal, battle-tested reference guides for modern 
 ## 📊 Interactive Live Guides & Frameworks
 Click the links below to view the live, interactive documentation or download the comprehensive PDFs:
 
-* **[The SQL Fluency Ladder](https://noumanahamed01-pixel.github.io/Data-Analytics-Master-Reference-Guides/sql_mastery_blueprint.html)**
+* **[The SQL Fluency Ladder](https://noumanahamed01-pixel.github.io/Data-Analytics-Master-Reference-Guides/sql_mastery_blueprint(1).html)**
   * *Focus:* Cloud warehouse optimization (Snowflake/BigQuery), Window Functions, and CTEs.
-* **[The BI Dashboard Ladder](https://noumanahamed01-pixel.github.io/Data-Analytics-Master-Reference-Guides/bi_dashboard_ladder.html)**
+* **[The BI Dashboard Ladder](https://noumanahamed01-pixel.github.io/Data-Analytics-Master-Reference-Guides/bi_dashboard_ladder(1).html)**
   * *Focus:* Semantic modeling, DAX/LOD context, Dynamic RLS, and UX data-ink ratios.
 * **[Applied Statistics for Data Analysts](https://noumanahamed01-pixel.github.io/Data-Analytics-Master-Reference-Guides/applied_stats_cheatsheet.html)**
   * *Focus:* A/B testing frameworks, causality, and a pre-model validation checklist.
